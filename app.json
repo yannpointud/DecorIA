@@ -1,0 +1,64 @@
+{
+  "expo": {
+    "name": "DecorIA",
+    "slug": "decoria",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.yourcompany.decoria",
+      "infoPlist": {
+        "NSCameraUsageDescription": "DecorIA needs access to your camera to capture room photos for transformation.",
+        "NSPhotoLibraryUsageDescription": "DecorIA needs access to your photo library to save transformed images.",
+        "NSPhotoLibraryAddUsageDescription": "DecorIA needs permission to save transformed images to your photo library."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.yourcompany.decoria",
+      "permissions": [
+        "CAMERA",
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_EXTERNAL_STORAGE"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow DecorIA to access your camera for room photos."
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Allow DecorIA to access your photos.",
+          "savePhotosPermission": "Allow DecorIA to save photos.",
+          "isAccessMediaLocationEnabled": true
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you select room images for transformation."
+        }
+      ]
+    ],
+  }
+}
