@@ -142,10 +142,10 @@ class GeminiService {
   private buildPrompt(style: TransformationStyle): string {
     return `Generate a transformed image of this room. ${style.prompt}
 
-Important requirements:
+Criticals requirements:
 - Generate and return ONLY the transformed image
 - Maintain the exact same perspective and camera angle
-- Keep the same room dimensions and architectural features
+- Keep the same room dimensions and all architectural features
 - Do not change the input aspect ratio - preserve the original image dimensions exactly
 - Maintain the exact same camera viewpoint and framing as the input image
 - Preserve natural lighting direction when possible

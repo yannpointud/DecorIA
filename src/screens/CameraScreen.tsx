@@ -11,7 +11,7 @@ import {
 
 import { CameraView, useCameraPermissions, CameraRatio } from 'expo-camera';
 
-import { IconButton, FAB } from 'react-native-paper';
+import { IconButton } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { useAppContext } from '../contexts/AppContext';
 import { useCamera } from '../hooks/useCamera';
@@ -27,7 +27,6 @@ export const CameraScreen: React.FC = () => {
   const [cameraType, setCameraType] = useState('back');
   const [isCapturing, setIsCapturing] = useState(false);
   const [aspectRatio, setAspectRatio] = useState<CameraRatio>('4:3'); // Par défaut 4:3
-  const [supportedRatios, setSupportedRatios] = useState<string[]>(['4:3']);
 
   const [permission, requestPermission] = useCameraPermissions();
 
@@ -38,23 +37,6 @@ export const CameraScreen: React.FC = () => {
       setHasPermission(permission.granted);
     }
   }, [permission]);
-
-  // Récupérer les ratios supportés
-  useEffect(() => {
-    const getSupportedRatios = async () => {
-      if (cameraRef.current && hasPermission) {
-        try {
-          const ratios = await cameraRef.current.getSupportedRatiosAsync();
-          setSupportedRatios(ratios);
-          console.log('Ratios supportés:', ratios);
-        } catch (error) {
-          console.log('Erreur récupération ratios:', error);
-        }
-      }
-    };
-
-    getSupportedRatios();
-  }, [hasPermission]);
 
   const takePicture = async () => {
     if (!cameraRef.current || isCapturing) return;

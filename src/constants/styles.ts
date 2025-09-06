@@ -14,7 +14,7 @@ export const TRANSFORMATION_STYLES: TransformationStyle[] = [
     prompt: 'A perfectly organized and immaculate room. Furniture is arranged harmoniously, the bed is neatly made with nothing on it. No clothes or objects on chairs, sofas, or tables. Cabinets and drawers are closed. Laundry is folded and stored. Decorations are minimalist, elegant, and aesthetically pleasing. The atmosphere is bright, clean, and well-maintained.',
     icon: 'broom',
     color: '#4CAF50',
-    description: 'Espace parfaitement organisé'
+    description: 'Espace organisé'
   },
   {
     id: 'empty',
