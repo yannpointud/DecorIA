@@ -195,8 +195,8 @@ Criticals requirements:
           ]
         }],
         generationConfig: {
-          temperature: 0.4,
-          topP: 0.8,
+          temperature: 0,
+          topP: 0.95,
           topK: 40,
           maxOutputTokens: 8192,
         }

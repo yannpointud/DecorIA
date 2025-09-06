@@ -11,7 +11,14 @@ export const TRANSFORMATION_STYLES: TransformationStyle[] = [
   {
     id: 'tidy',
     name: 'Rangée',
-    prompt: 'A perfectly organized and immaculate room. Furniture is arranged harmoniously, the bed is neatly made with nothing on it. No clothes or objects on chairs, sofas, or tables. Cabinets and drawers are closed. Laundry is folded and stored. Decorations are minimalist, elegant, and aesthetically pleasing. The atmosphere is bright, clean, and well-maintained.',
+    prompt: `Your primary task is to digitally tidy this room. You must identify and remove all clutter while preserving the main furniture and the room's structure.
+
+**Specific actions required:**
+1.  **Clear all surfaces:** Remove any loose items from the floor, chairs, sofas, tables, and desks.
+2.  **Make the bed:** If there is a bed, it must be neatly made, with the covers smooth and pillows arranged.
+3.  **Close everything:** Ensure all drawers, cabinets, and wardrobe doors are fully closed.
+
+**Crucial Rule:** You are an editor, not a creator. **DO NOT** add, replace, or significantly alter the existing furniture. A messy chair should become the *exact same chair*, but with the clothes removed from it. The final image must be the same room, just perfectly clean and organized.`,
     icon: 'broom',
     color: '#4CAF50',
     description: 'Espace organisé'
@@ -19,7 +26,14 @@ export const TRANSFORMATION_STYLES: TransformationStyle[] = [
   {
     id: 'empty',
     name: 'Vide',
-    prompt: 'Remove all furniture and objects from this room, keeping only the walls, floor, ceiling, windows and doors. Show the empty architectural space.',
+    prompt: `Your task is to perform a digital cleanup of this room. You must only remove all furniture, decorations, and movable objects (like rugs, lamps, plants, wall art).
+
+Strict instructions:
+1. DO NOT ADD any new architectural elements. Do not add windows, doors, or anything that is not present in the original image.
+2. PRESERVE WITH 100% FIDELITY: The original walls, floor, ceiling, windows, and doors must remain completely unchanged in their position, shape, and texture.
+3. INPAINT LOGICALLY: When a piece of furniture is removed, you must fill the empty space by seamlessly extending the texture and color of the wall and floor that were behind it. The goal is to reveal what is hidden, not to invent something new.
+
+The final image must be the empty architectural shell of the exact same room.`,
     icon: 'cube-outline',
     color: '#2196F3',
     description: 'Pièce sans meubles'

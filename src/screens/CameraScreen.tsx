@@ -7,12 +7,13 @@ import {
   TouchableOpacity,
   Alert,
   Platform,
+  BackHandler,
 } from 'react-native';
 
 import { CameraView, useCameraPermissions, CameraRatio } from 'expo-camera';
 
 import { IconButton } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { useAppContext } from '../contexts/AppContext';
 import { useCamera } from '../hooks/useCamera';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -22,6 +23,7 @@ export const CameraScreen: React.FC = () => {
   const cameraRef = useRef<CameraView>(null);
   const { setOriginalImage, setCaptureAspectRatio } = useAppContext();
   const { pickFromGallery } = useCamera();
+  const isFocused = useIsFocused();
   
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [cameraType, setCameraType] = useState('back');
@@ -72,6 +74,14 @@ export const CameraScreen: React.FC = () => {
     }
   };
 
+  const handleClose = () => {
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      BackHandler.exitApp();
+    }
+  };
+
   if (hasPermission === null) {
     return (
       <View style={styles.container}>
@@ -98,18 +108,19 @@ export const CameraScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <CameraView 
-        ref={cameraRef}
-        style={styles.camera} 
-        facing={cameraType}
-        ratio={aspectRatio}
-      >
+      {isFocused && (
+        <CameraView 
+          ref={cameraRef}
+          style={styles.camera} 
+          facing={cameraType}
+          ratio={aspectRatio}
+        >
         <View style={styles.topControls}>
           <IconButton
             icon="close"
             size={30}
             iconColor="white"
-            onPress={() => navigation.goBack()}
+            onPress={handleClose}
             style={styles.controlButton}
           />
           
@@ -164,7 +175,8 @@ export const CameraScreen: React.FC = () => {
           
           <View style={{ width: 50 }} />
         </View>
-      </CameraView>
+        </CameraView>
+      )}
     </View>
   );
 };
