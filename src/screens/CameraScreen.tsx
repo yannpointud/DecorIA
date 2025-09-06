@@ -9,7 +9,7 @@ import {
   Platform,
 } from 'react-native';
 
-import { Camera } from 'expo-camera';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 
 import { IconButton, FAB } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
@@ -19,7 +19,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 
 export const CameraScreen: React.FC = () => {
   const navigation = useNavigation<any>();
-  const cameraRef = useRef<Camera>(null);
+  const cameraRef = useRef<CameraView>(null);
   const { setOriginalImage } = useAppContext();
   const { pickFromGallery } = useCamera();
   
@@ -27,12 +27,15 @@ export const CameraScreen: React.FC = () => {
   const [cameraType, setCameraType] = useState('back');
   const [isCapturing, setIsCapturing] = useState(false);
 
+  const [permission, requestPermission] = useCameraPermissions();
+
   useEffect(() => {
-    (async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      setHasPermission(status === 'granted');
-    })();
-  }, []);
+    if (permission === null) {
+      requestPermission();
+    } else {
+      setHasPermission(permission.granted);
+    }
+  }, [permission]);
 
   const takePicture = async () => {
     if (!cameraRef.current || isCapturing) return;
@@ -93,11 +96,10 @@ export const CameraScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Camera 
+      <CameraView 
         ref={cameraRef}
         style={styles.camera} 
-        type={cameraType}
-        ratio="4:3"
+        facing={cameraType}
       >
         <View style={styles.topControls}>
           <IconButton
@@ -135,7 +137,7 @@ export const CameraScreen: React.FC = () => {
           
           <View style={{ width: 50 }} />
         </View>
-      </Camera>
+      </CameraView>
     </View>
   );
 };

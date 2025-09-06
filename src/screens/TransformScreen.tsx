@@ -31,6 +31,9 @@ export const TransformScreen: React.FC = () => {
   } = useAppContext();
   const { transformImage, mockTransform } = useImageTransform();
   const [useMockApi, setUseMockApi] = useState(false); // Use real API by default
+  const [localLoading, setLocalLoading] = useState(false); // Local state pour affichage immédiat
+  const [smoothProgress, setSmoothProgress] = useState(0); // Animation fluide
+  const [realProgress, setRealProgress] = useState(0); // Vrai progrès API
 
   useEffect(() => {
     if (!originalImage) {
@@ -38,26 +41,73 @@ export const TransformScreen: React.FC = () => {
     }
   }, [originalImage, navigation]);
 
+  // Animation fluide du progrès
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+    
+    // Phases : 0% → 50% (jalons réels) → 50% → 90% (animation) → 90% → 100% (jalons finaux)
+    if (realProgress >= 0.4 && realProgress < 0.8 && localLoading) {
+      // Démarre l'animation fluide de 50% à 90% (remplace la longue attente API)
+      if (smoothProgress < 0.5) {
+        setSmoothProgress(0.5); // Force le départ à 50%
+      }
+      interval = setInterval(() => {
+        setSmoothProgress(prev => {
+          // Augmente de 5% toutes les secondes jusqu'à maximum 90%
+          const newProgress = Math.min(prev + 0.05, 0.9);
+          return newProgress;
+        });
+      }, 1000);
+    } else if (realProgress >= 0.8) {
+      // Quand l'API répond (80%+), mapper vers 90%+ et finir
+      const mappedProgress = 0.9 + (realProgress - 0.8) * 0.5; // 80%→90%, 100%→100%
+      setSmoothProgress(mappedProgress);
+    } else if (realProgress < 0.4) {
+      // Utilise le vrai progrès pour les phases initiales, mais mappé sur 0% → 50%
+      const mappedInitialProgress = realProgress * 1.25; // 0%→0%, 30%→37.5%, 40%→50%
+      setSmoothProgress(mappedInitialProgress);
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [realProgress, localLoading]);
+
+  // Sync avec le loadingProgress du contexte global
+  useEffect(() => {
+    setRealProgress(loadingProgress);
+  }, [loadingProgress]);
+
   const handleTransform = async () => {
-    console.log('handleTransform called');
-    console.log('isLoading before:', isLoading);
-    console.log('selectedStyle:', selectedStyle);
-    console.log('useMockApi:', useMockApi);
+    console.log('🔥 handleTransform called');
+    console.log('🔥 selectedStyle:', selectedStyle);
+    console.log('🔥 useMockApi:', useMockApi);
     
     if (!selectedStyle) {
       Alert.alert('Attention', 'Veuillez sélectionner un style');
       return;
     }
 
-    const success = useMockApi 
-      ? await mockTransform()
-      : await transformImage();
+    // Active le loading local IMMÉDIATEMENT (pas de délai React)
+    setLocalLoading(true);
+    setSmoothProgress(0);
+    setRealProgress(0);
+    
+    try {
+      const success = useMockApi 
+        ? await mockTransform()
+        : await transformImage();
 
-    console.log('isLoading after transform:', isLoading);
-    console.log('transform success:', success);
+      console.log('🔥 transform success:', success);
 
-    if (success) {
-      navigation.navigate('Result');
+      if (success) {
+        navigation.navigate('Result');
+      }
+    } finally {
+      // Désactive le loading local
+      setLocalLoading(false);
+      setSmoothProgress(0);
+      setRealProgress(0);
     }
   };
 
@@ -110,20 +160,26 @@ export const TransformScreen: React.FC = () => {
         <View style={styles.buttonContainer}>
           <Button
             mode="contained"
-            onPress={handleTransform}
-            disabled={!selectedStyle || isLoading}
+            onPress={() => {
+              console.log('🔥 BUTTON PRESSED!');
+              console.log('🔥 selectedStyle exists:', !!selectedStyle);
+              console.log('🔥 isLoading:', isLoading);
+              console.log('🔥 button disabled:', !selectedStyle || isLoading);
+              handleTransform();
+            }}
+            disabled={!selectedStyle || localLoading || isLoading}
             style={styles.transformButton}
             contentStyle={styles.transformButtonContent}
-            loading={isLoading}
+            loading={localLoading || isLoading}
           >
-            {isLoading ? 'Transformation...' : 'Transformer'}
+            {(localLoading || isLoading) ? 'Transformation...' : 'Transformer'}
           </Button>
         </View>
       </ScrollView>
 
       <LoadingOverlay
-        visible={isLoading}
-        progress={loadingProgress}
+        visible={localLoading || isLoading}
+        progress={smoothProgress}
         message="Transformation en cours..."
       />
     </View>

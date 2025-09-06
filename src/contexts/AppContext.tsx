@@ -47,12 +47,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const setIsLoading = (loading: boolean) => {
-    console.log('setIsLoading called with:', loading);
     setState(prev => ({ ...prev, isLoading: loading, error: null }));
   };
 
   const setLoadingProgress = (progress: number) => {
-    console.log('setLoadingProgress called with:', progress);
     setState(prev => ({ ...prev, loadingProgress: progress }));
   };
 

@@ -28,7 +28,11 @@ interface GeminiResponse {
   candidates: [{
     content: {
       parts: [{
-        text: string;
+        text?: string;
+        inlineData?: {
+          mimeType: string;
+          data: string;
+        };
       }];
     };
   }];
@@ -142,6 +146,8 @@ Important requirements:
 - Generate and return ONLY the transformed image
 - Maintain the exact same perspective and camera angle
 - Keep the same room dimensions and architectural features
+- Do not change the input aspect ratio - preserve the original image dimensions exactly
+- Maintain the exact same camera viewpoint and framing as the input image
 - Preserve natural lighting direction when possible
 - Create a photorealistic transformation
 - Do not provide text descriptions, only generate the image`;

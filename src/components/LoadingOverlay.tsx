@@ -21,6 +21,7 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
   progress = 0,
   message = 'Transformation en cours...',
 }) => {
+  console.log('🚀 LoadingOverlay render - visible:', visible, 'progress:', progress);
   if (!visible) return null;
   
   return (

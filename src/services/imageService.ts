@@ -99,26 +99,27 @@ class ImageService {
         if (!granted) return false;
       }
 
-      // Si c'est une URL distante, télécharger d'abord
+      // Convertir l'image en fichier local avec extension
       let localUri = imageUri;
-      if (imageUri.startsWith('http')) {
+      
+      if (imageUri.startsWith('data:image')) {
+        // Image base64 - convertir en fichier local
+        console.log('💾 Converting base64 to local file...');
+        localUri = await this.base64ToUri(imageUri);
+      } else if (imageUri.startsWith('http')) {
+        // URL distante - télécharger
         const downloadPath = `${FileSystem.cacheDirectory}decoria_${Date.now()}.jpg`;
         const downloadResult = await FileSystem.downloadAsync(imageUri, downloadPath);
         localUri = downloadResult.uri;
       }
-
-      // Sauvegarder dans la galerie
-      const asset = await MediaLibrary.createAssetAsync(localUri);
       
-      // Créer un album DecorIA si nécessaire
-      const album = await MediaLibrary.getAlbumAsync('DecorIA');
-      if (album === null) {
-        await MediaLibrary.createAlbumAsync('DecorIA', asset, false);
-      } else {
-        await MediaLibrary.addAssetsToAlbumAsync([asset], album, false);
-      }
+      console.log('💾 Final localUri:', localUri);
 
-      Alert.alert('Succès', 'Image sauvegardée dans la galerie');
+      // Sauvegarder directement dans la galerie principale du téléphone
+      const asset = await MediaLibrary.createAssetAsync(localUri);
+      console.log('💾 Image saved to main gallery:', asset.uri);
+
+      Alert.alert('Succès', 'Image sauvegardée dans vos Photos');
       return true;
     } catch (error) {
       console.error('Error saving to gallery:', error);
@@ -172,10 +173,14 @@ class ImageService {
       // Enlever le préfixe data:image si présent
       const cleanBase64 = base64.replace(/^data:image\/[a-z]+;base64,/, '');
       
+      console.log('💾 Writing base64 to file:', filename);
+      console.log('💾 Base64 length:', cleanBase64.length);
+      
       await FileSystem.writeAsStringAsync(filename, cleanBase64, {
         encoding: FileSystem.EncodingType.Base64,
       });
 
+      console.log('💾 File written successfully:', filename);
       return filename;
     } catch (error) {
       console.error('Error converting base64 to URI:', error);
