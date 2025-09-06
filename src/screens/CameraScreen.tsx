@@ -9,7 +9,7 @@ import {
   Platform,
 } from 'react-native';
 
-import { CameraView, useCameraPermissions } from 'expo-camera';
+import { CameraView, useCameraPermissions, CameraRatio } from 'expo-camera';
 
 import { IconButton, FAB } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
@@ -20,12 +20,14 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 export const CameraScreen: React.FC = () => {
   const navigation = useNavigation<any>();
   const cameraRef = useRef<CameraView>(null);
-  const { setOriginalImage } = useAppContext();
+  const { setOriginalImage, setCaptureAspectRatio } = useAppContext();
   const { pickFromGallery } = useCamera();
   
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [cameraType, setCameraType] = useState('back');
   const [isCapturing, setIsCapturing] = useState(false);
+  const [aspectRatio, setAspectRatio] = useState<CameraRatio>('4:3'); // Par défaut 4:3
+  const [supportedRatios, setSupportedRatios] = useState<string[]>(['4:3']);
 
   const [permission, requestPermission] = useCameraPermissions();
 
@@ -36,6 +38,23 @@ export const CameraScreen: React.FC = () => {
       setHasPermission(permission.granted);
     }
   }, [permission]);
+
+  // Récupérer les ratios supportés
+  useEffect(() => {
+    const getSupportedRatios = async () => {
+      if (cameraRef.current && hasPermission) {
+        try {
+          const ratios = await cameraRef.current.getSupportedRatiosAsync();
+          setSupportedRatios(ratios);
+          console.log('Ratios supportés:', ratios);
+        } catch (error) {
+          console.log('Erreur récupération ratios:', error);
+        }
+      }
+    };
+
+    getSupportedRatios();
+  }, [hasPermission]);
 
   const takePicture = async () => {
     if (!cameraRef.current || isCapturing) return;
@@ -49,6 +68,7 @@ export const CameraScreen: React.FC = () => {
       });
       
       setOriginalImage(photo.uri);
+      setCaptureAspectRatio(aspectRatio);
       navigation.navigate('Transform');
     } catch (error) {
       Alert.alert('Erreur', 'Impossible de prendre la photo');
@@ -100,6 +120,7 @@ export const CameraScreen: React.FC = () => {
         ref={cameraRef}
         style={styles.camera} 
         facing={cameraType}
+        ratio={aspectRatio}
       >
         <View style={styles.topControls}>
           <IconButton
@@ -109,6 +130,30 @@ export const CameraScreen: React.FC = () => {
             onPress={() => navigation.goBack()}
             style={styles.controlButton}
           />
+          
+          <View style={styles.aspectRatioSelector}>
+            {[{ label: '16:9', value: '16:9' }, { label: '4:3', value: '4:3' }].map((ratio) => {
+              const isSelected = ratio.value === aspectRatio;
+              return (
+                <TouchableOpacity
+                  key={ratio.label}
+                  style={[
+                    styles.ratioButton,
+                    isSelected && styles.ratioButtonSelected
+                  ]}
+                  onPress={() => setAspectRatio(ratio.value as CameraRatio)}
+                >
+                  <Text style={[
+                    styles.ratioButtonText,
+                    isSelected && styles.ratioButtonTextSelected
+                  ]}>
+                    {ratio.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+          
           <IconButton
             icon="camera-flip"
             size={30}
@@ -205,5 +250,28 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: '600',
+  },
+  aspectRatioSelector: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    borderRadius: 20,
+    padding: 4,
+  },
+  ratioButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    marginHorizontal: 2,
+  },
+  ratioButtonSelected: {
+    backgroundColor: 'white',
+  },
+  ratioButtonText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  ratioButtonTextSelected: {
+    color: 'black',
   },
 });

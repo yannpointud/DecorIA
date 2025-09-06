@@ -11,7 +11,7 @@ export const TRANSFORMATION_STYLES: TransformationStyle[] = [
   {
     id: 'tidy',
     name: 'Rangée',
-    prompt: 'Transform this room into a perfectly organized and tidy version. Remove all clutter, organize items neatly, make the bed if present, arrange furniture properly, and make it look pristine and well-maintained.',
+    prompt: 'A perfectly organized and immaculate room. Furniture is arranged harmoniously, the bed is neatly made with nothing on it. No clothes or objects on chairs, sofas, or tables. Cabinets and drawers are closed. Laundry is folded and stored. Decorations are minimalist, elegant, and aesthetically pleasing. The atmosphere is bright, clean, and well-maintained.',
     icon: 'broom',
     color: '#4CAF50',
     description: 'Espace parfaitement organisé'
@@ -36,7 +36,7 @@ export const TRANSFORMATION_STYLES: TransformationStyle[] = [
     id: 'deteriorated',
     name: 'Délabrée',
     prompt: 'Transform this room to look abandoned and deteriorated. Add wear, peeling paint, damaged walls, broken items, dust, and signs of neglect while keeping the same structure.',
-    icon: 'home-broken',
+    icon: 'home-minus',
     color: '#795548',
     description: 'Version abandonnée'
   },

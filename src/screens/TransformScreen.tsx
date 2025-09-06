@@ -25,6 +25,7 @@ export const TransformScreen: React.FC = () => {
     originalImage,
     selectedStyle,
     setSelectedStyle,
+    captureAspectRatio,
     isLoading,
     loadingProgress,
     error,
@@ -131,8 +132,17 @@ export const TransformScreen: React.FC = () => {
       </Appbar.Header>
 
       <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.imageContainer}>
-          <Image source={{ uri: originalImage }} style={styles.previewImage} />
+        <View style={[
+          styles.imageContainer,
+          captureAspectRatio === '4:3' ? styles.imageContainer43 : styles.imageContainer169
+        ]}>
+          <Image 
+            source={{ uri: originalImage }} 
+            style={[
+              styles.previewImage,
+              captureAspectRatio === '4:3' ? styles.previewImage43 : styles.previewImage169
+            ]} 
+          />
           <View style={styles.imageOverlay}>
             <Text style={styles.imageLabel}>Photo originale</Text>
           </View>
@@ -196,15 +206,29 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     position: 'relative',
+    alignSelf: 'center',
     margin: 16,
     borderRadius: 12,
     overflow: 'hidden',
     elevation: 4,
   },
+  imageContainer43: {
+    width: 320, // 240 * (4/3)
+    height: 240,
+  },
+  imageContainer169: {
+    width: 320, // 180 * (16/9)
+    height: 180,
+  },
   previewImage: {
     width: '100%',
-    height: 200,
     resizeMode: 'cover',
+  },
+  previewImage43: {
+    height: '100%',
+  },
+  previewImage169: {
+    height: '100%',
   },
   imageOverlay: {
     position: 'absolute',

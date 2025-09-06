@@ -195,7 +195,7 @@ Important requirements:
           ]
         }],
         generationConfig: {
-          temperature: 0.7,
+          temperature: 0.4,
           topP: 0.8,
           topK: 40,
           maxOutputTokens: 8192,
@@ -225,17 +225,30 @@ Important requirements:
         throw new Error('Invalid response from Gemini API');
       }
 
-      const part = candidate.content.parts[0];
+      // Chercher l'image dans toutes les parties de la réponse
+      let generatedImageUrl: string | null = null;
       
-      // Pour un modèle de génération d'image, l'image peut être dans inlineData
-      let generatedImageUrl: string;
-      if (part.inlineData?.data) {
-        // Image en base64 dans inlineData
-        generatedImageUrl = `data:${part.inlineData.mimeType || 'image/jpeg'};base64,${part.inlineData.data}`;
-      } else if (part.text) {
-        // Fallback si l'image est dans text
-        generatedImageUrl = this.extractImageFromResponse(part.text);
-      } else {
+      for (const part of candidate.content.parts) {
+        console.log('Checking part:', JSON.stringify(part, null, 2));
+        
+        if (part.inlineData?.data) {
+          // Image en base64 dans inlineData
+          generatedImageUrl = `data:${part.inlineData.mimeType || 'image/jpeg'};base64,${part.inlineData.data}`;
+          console.log('Found image in inlineData');
+          break;
+        } else if (part.text) {
+          // Essayer d'extraire une URL ou base64 du texte
+          const extractedUrl = this.extractImageFromResponse(part.text);
+          if (extractedUrl) {
+            generatedImageUrl = extractedUrl;
+            console.log('Found image in text:', extractedUrl.substring(0, 50) + '...');
+            break;
+          }
+        }
+      }
+      
+      if (!generatedImageUrl) {
+        console.error('No image found in any part of the response');
         throw new Error('No image data found in response');
       }
 
@@ -266,28 +279,39 @@ Important requirements:
    * Extrait l'URL de l'image de la réponse Gemini
    * Note: Ceci dépendra du format exact de la réponse de l'API
    */
-  private extractImageFromResponse(responseText: string): string {
-    // Pour le POC, on assume que Gemini retourne une URL ou base64
-    // À adapter selon la vraie réponse de l'API
+  private extractImageFromResponse(responseText: string): string | null {
+    if (!responseText) return null;
+    
+    console.log('Extracting image from text response (first 200 chars):', responseText.substring(0, 200));
     
     // Si c'est une URL directe
     if (responseText.startsWith('http')) {
-      return responseText;
+      return responseText.trim();
     }
     
-    // Si c'est du base64
+    // Si c'est du base64 complet
     if (responseText.includes('data:image')) {
-      return responseText;
+      const base64Match = responseText.match(/data:image\/[^;]+;base64,[A-Za-z0-9+/=]+/);
+      if (base64Match) {
+        return base64Match[0];
+      }
     }
     
     // Essayer d'extraire une URL du texte
-    const urlMatch = responseText.match(/https?:\/\/[^\s]+/);
+    const urlMatch = responseText.match(/https?:\/\/[^\s\)]+/);
     if (urlMatch) {
       return urlMatch[0];
     }
     
-    // Si c'est du base64 brut
-    return `data:image/jpeg;base64,${responseText}`;
+    // Vérifier si c'est du base64 brut (au moins 100 caractères valides)
+    const cleanText = responseText.trim();
+    if (cleanText.length > 100 && /^[A-Za-z0-9+/=]+$/.test(cleanText)) {
+      console.log('Detected raw base64, length:', cleanText.length);
+      return `data:image/jpeg;base64,${cleanText}`;
+    }
+    
+    console.log('No image format detected in text response');
+    return null;
   }
 
   /**

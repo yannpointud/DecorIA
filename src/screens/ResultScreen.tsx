@@ -4,7 +4,6 @@ import {
   View,
   StyleSheet,
   Alert,
-  Share,
   Platform,
 } from 'react-native';
 import { Appbar, FAB } from 'react-native-paper';
@@ -26,18 +25,6 @@ export const ResultScreen: React.FC = () => {
     }
   };
 
-  const handleShare = async () => {
-    if (!transformedImage) return;
-
-    try {
-      await Share.share({
-        message: 'Regardez cette transformation incroyable réalisée avec DecorIA!',
-        url: transformedImage,
-      });
-    } catch (error) {
-      Alert.alert('Erreur', 'Impossible de partager l\'image');
-    }
-  };
 
   const handleNewPhoto = () => {
     resetState();
@@ -65,7 +52,6 @@ export const ResultScreen: React.FC = () => {
       <Appbar.Header>
         <Appbar.BackAction onPress={() => navigation.goBack()} />
         <Appbar.Content title="Résultat" />
-        <Appbar.Action icon="share" onPress={handleShare} />
       </Appbar.Header>
 
       <ImageComparison

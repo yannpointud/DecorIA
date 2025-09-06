@@ -18,24 +18,34 @@ export const StyleCard: React.FC<StyleCardProps> = ({
 }) => {
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
-      <Card style={[styles.card, selected && styles.selectedCard]}>
-        <View
-          style={[
-            styles.iconContainer,
-            { backgroundColor: style.color },
-            selected && styles.selectedIconContainer,
-          ]}
-        >
-          <MaterialCommunityIcons
-            name={style.icon as any}
-            size={32}
-            color="white"
-          />
+      <Card style={[
+        styles.card, 
+        selected ? [styles.selectedCard, { borderColor: style.color }] : styles.unselectedCard
+      ]}>
+        <View style={styles.cardContent}>
+          <View
+            style={[
+              styles.iconContainer,
+              { backgroundColor: style.color },
+              selected ? styles.selectedIconContainer : styles.unselectedIconContainer,
+            ]}
+          >
+            <MaterialCommunityIcons
+              name={style.icon as any}
+              size={24}
+              color="white"
+            />
+          </View>
+          <View style={styles.textContainer}>
+            <Text style={[
+              styles.title, 
+              selected ? [styles.selectedTitle, { color: style.color }] : styles.title
+            ]}>
+              {style.name}
+            </Text>
+            <Text style={styles.description}>{style.description}</Text>
+          </View>
         </View>
-        <Text style={[styles.title, selected && styles.selectedTitle]}>
-          {style.name}
-        </Text>
-        <Text style={styles.description}>{style.description}</Text>
       </Card>
     </TouchableOpacity>
   );
@@ -43,40 +53,55 @@ export const StyleCard: React.FC<StyleCardProps> = ({
 
 const styles = StyleSheet.create({
   card: {
-    width: 160,
-    margin: 8,
-    padding: 16,
-    alignItems: 'center',
+    width: 180,
+    margin: 6,
+    padding: 12,
     elevation: 3,
   },
   selectedCard: {
     borderWidth: 2,
-    borderColor: '#2196F3',
     elevation: 6,
+    backgroundColor: '#f8f9fa',
+  },
+  unselectedCard: {
+    borderWidth: 2,
+    borderColor: 'transparent',
+    elevation: 3,
+    backgroundColor: '#ffffff',
+  },
+  cardContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   iconContainer: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 12,
+    marginRight: 12,
   },
   selectedIconContainer: {
     transform: [{ scale: 1.1 }],
   },
+  unselectedIconContainer: {
+    transform: [{ scale: 1.0 }],
+  },
+  textContainer: {
+    flex: 1,
+  },
   title: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
     color: '#333',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   selectedTitle: {
-    color: '#2196F3',
+    fontWeight: '700',
   },
   description: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#666',
-    textAlign: 'center',
+    lineHeight: 14,
   },
 });

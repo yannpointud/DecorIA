@@ -5,6 +5,7 @@ interface AppState {
   originalImage: string | null;
   transformedImage: string | null;
   selectedStyle: TransformationStyle | null;
+  captureAspectRatio: string | null;
   isLoading: boolean;
   loadingProgress: number;
   error: string | null;
@@ -14,6 +15,7 @@ interface AppContextType extends AppState {
   setOriginalImage: (uri: string | null) => void;
   setTransformedImage: (uri: string | null) => void;
   setSelectedStyle: (style: TransformationStyle | null) => void;
+  setCaptureAspectRatio: (ratio: string | null) => void;
   setIsLoading: (loading: boolean) => void;
   setLoadingProgress: (progress: number) => void;
   setError: (error: string | null) => void;
@@ -24,6 +26,7 @@ const initialState: AppState = {
   originalImage: null,
   transformedImage: null,
   selectedStyle: null,
+  captureAspectRatio: null,
   isLoading: false,
   loadingProgress: 0,
   error: null,
@@ -44,6 +47,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const setSelectedStyle = (style: TransformationStyle | null) => {
     setState(prev => ({ ...prev, selectedStyle: style }));
+  };
+
+  const setCaptureAspectRatio = (ratio: string | null) => {
+    setState(prev => ({ ...prev, captureAspectRatio: ratio }));
   };
 
   const setIsLoading = (loading: boolean) => {
@@ -67,6 +74,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setOriginalImage,
     setTransformedImage,
     setSelectedStyle,
+    setCaptureAspectRatio,
     setIsLoading,
     setLoadingProgress,
     setError,
