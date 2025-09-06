@@ -9,7 +9,7 @@ import {
   Platform,
 } from 'react-native';
 
-import { Camera, CameraType } from 'expo-camera';
+import { Camera } from 'expo-camera';
 
 import { IconButton, FAB } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
@@ -24,7 +24,7 @@ export const CameraScreen: React.FC = () => {
   const { pickFromGallery } = useCamera();
   
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
-  const [cameraType, setCameraType] = useState(CameraType.back);
+  const [cameraType, setCameraType] = useState('back');
   const [isCapturing, setIsCapturing] = useState(false);
 
   useEffect(() => {
@@ -55,8 +55,8 @@ export const CameraScreen: React.FC = () => {
   };
 
   const toggleCameraType = () => {
-    setCameraType((current: any) =>
-      current === CameraType.back ? CameraType.front : CameraType.back
+    setCameraType((current: string) =>
+      current === 'back' ? 'front' : 'back'
     );
   };
 
