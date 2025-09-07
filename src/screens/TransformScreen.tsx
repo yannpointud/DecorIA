@@ -15,6 +15,7 @@ import { useAppContext } from '../contexts/AppContext';
 import { useImageTransform } from '../hooks/useImageTransform';
 import { StyleCard } from '../components/StyleCard';
 import { LoadingOverlay } from '../components/LoadingOverlay';
+import { AdaptiveImage } from '../components/AdaptiveImage';
 import { TRANSFORMATION_STYLES } from '../constants/styles';
 
 const { width: screenWidth } = Dimensions.get('window');
@@ -132,21 +133,11 @@ export const TransformScreen: React.FC = () => {
       </Appbar.Header>
 
       <ScrollView contentContainerStyle={styles.content}>
-        <View style={[
-          styles.imageContainer,
-          captureAspectRatio === '4:3' ? styles.imageContainer43 : styles.imageContainer169
-        ]}>
-          <Image 
-            source={{ uri: originalImage }} 
-            style={[
-              styles.previewImage,
-              captureAspectRatio === '4:3' ? styles.previewImage43 : styles.previewImage169
-            ]} 
-          />
-          <View style={styles.imageOverlay}>
-            <Text style={styles.imageLabel}>Photo originale</Text>
-          </View>
-        </View>
+        <AdaptiveImage
+          source={{ uri: originalImage }}
+          showLabel="Photo originale"
+          containerStyle={styles.imageContainer}
+        />
 
         <Text style={styles.sectionTitle}>Sélectionnez un style :</Text>
 
@@ -205,43 +196,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   imageContainer: {
-    position: 'relative',
-    alignSelf: 'center',
     margin: 16,
-    borderRadius: 12,
-    overflow: 'hidden',
-    elevation: 4,
-  },
-  imageContainer43: {
-    width: 320, // 240 * (4/3)
-    height: 240,
-  },
-  imageContainer169: {
-    width: 320, // 180 * (16/9)
-    height: 180,
-  },
-  previewImage: {
-    width: '100%',
-    resizeMode: 'cover',
-  },
-  previewImage43: {
-    height: '100%',
-  },
-  previewImage169: {
-    height: '100%',
-  },
-  imageOverlay: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    padding: 8,
-  },
-  imageLabel: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: '600',
   },
   sectionTitle: {
     fontSize: 18,

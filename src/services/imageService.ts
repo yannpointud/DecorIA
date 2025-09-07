@@ -70,8 +70,8 @@ class ImageService {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
+        allowsEditing: true,  // Permet le recadrage libre
+        // aspect: [4, 3],    // ✅ SUPPRIMÉ - Ratio libre
         quality: 1,
         base64: false,
       });
@@ -141,17 +141,20 @@ class ImageService {
    */
   async optimizeImageForDisplay(imageUri: string): Promise<string> {
     try {
+      // Utiliser les constantes unifiées pour l'optimisation
+      const { IMAGE_CONFIG } = await import('../constants/config');
+      
       const manipulatedImage = await ImageManipulator.manipulateAsync(
         imageUri,
         [
           {
             resize: {
-              width: 1080,
+              width: IMAGE_CONFIG.MAX_DIMENSION,
             },
           },
         ],
         {
-          compress: 0.8,
+          compress: IMAGE_CONFIG.COMPRESSION_QUALITY,
           format: ImageManipulator.SaveFormat.JPEG,
         }
       );

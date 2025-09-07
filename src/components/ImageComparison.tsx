@@ -9,6 +9,7 @@ import {
   Text,
 } from 'react-native';
 import { IconButton } from 'react-native-paper';
+import { AdaptiveImage } from './AdaptiveImage';
 
 interface ImageComparisonProps {
   beforeImage: string;
@@ -21,11 +22,16 @@ export const ImageComparison: React.FC<ImageComparisonProps> = ({
   beforeImage,
   afterImage,
 }) => {
-  // Afficher seulement l'image transformée par défaut
+  // Utiliser AdaptiveImage pour un affichage optimal
   return (
     <View style={styles.simpleContainer}>
-      <Image source={{ uri: afterImage }} style={styles.simpleImage} />
-      <Text style={styles.simpleLabel}>Image transformée</Text>
+      <AdaptiveImage
+        source={{ uri: afterImage }}
+        showLabel="Image transformée"
+        maxWidth={screenWidth - 32}
+        maxHeight={screenWidth * 1.2} // Permet images verticales
+        containerStyle={styles.imageContainer}
+      />
     </View>
   );
 };
@@ -37,20 +43,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  simpleImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'contain',
-  },
-  simpleLabel: {
-    position: 'absolute',
-    top: 20,
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 4,
+  imageContainer: {
+    // AdaptiveImage gère déjà les styles de base
+    backgroundColor: 'transparent', // Pas de fond gris sur fond noir
   },
 });

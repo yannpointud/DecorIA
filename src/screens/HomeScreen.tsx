@@ -11,6 +11,7 @@ import { Button } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { useCamera } from '../hooks/useCamera';
 import { theme } from '../constants/theme';
+import { IMAGE_DIMENSIONS } from '../constants/dimensions';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const { width: screenWidth } = Dimensions.get('window');
@@ -95,8 +96,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   logo: {
-    width: 240,
-    height: 240,
+    width: IMAGE_DIMENSIONS.LOGO_SIZE,
+    height: IMAGE_DIMENSIONS.LOGO_SIZE,
     marginBottom: 20,
   },
   subtitle: {
