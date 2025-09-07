@@ -8,6 +8,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AppProvider } from './src/contexts/AppContext';
 import { theme } from './src/constants/theme';
+import { HomeScreen } from './src/screens/HomeScreen';
 import { CameraScreen } from './src/screens/CameraScreen';
 import { TransformScreen } from './src/screens/TransformScreen';
 import { ResultScreen } from './src/screens/ResultScreen';
@@ -15,6 +16,7 @@ import imageService from './src/services/imageService';
 
 // Type pour la navigation
 export type RootStackParamList = {
+  Home: undefined;
   Camera: undefined;
   Transform: undefined;
   Result: undefined;
@@ -41,12 +43,19 @@ export default function App() {
           <NavigationContainer>
             <StatusBar style="dark" />
             <Stack.Navigator
-              initialRouteName="Camera"
+              initialRouteName="Home"
               screenOptions={{
                 headerShown: false,
                 gestureEnabled: true,
               }}
             >
+              <Stack.Screen 
+                name="Home" 
+                component={HomeScreen}
+                options={{
+                  title: 'Accueil',
+                }}
+              />
               <Stack.Screen 
                 name="Camera" 
                 component={CameraScreen}

@@ -28,7 +28,7 @@ export const ResultScreen: React.FC = () => {
 
   const handleNewPhoto = () => {
     resetState();
-    navigation.navigate('Camera');
+    navigation.navigate('Home');
   };
 
   const handleRetry = () => {
@@ -39,7 +39,7 @@ export const ResultScreen: React.FC = () => {
   useEffect(() => {
     if (!originalImage || !transformedImage) {
       // Should not happen, but handle gracefully
-      navigation.navigate('Camera');
+      navigation.navigate('Home');
     }
   }, [originalImage, transformedImage, navigation]);
 

@@ -58,21 +58,41 @@ class GeminiService {
       }
 
       // Version native (iOS/Android)
+      // D'abord, obtenir les dimensions originales
+      const originalInfo = await ImageManipulator.manipulateAsync(
+        imageUri,
+        [],
+        { format: ImageManipulator.SaveFormat.JPEG }
+      );
+
+      // Calculer les nouvelles dimensions en préservant le ratio
+      const { width: originalWidth, height: originalHeight } = originalInfo;
+      const maxDimension = IMAGE_CONFIG.MAX_DIMENSION;
+
+      let resizeConfig: any = [];
+
+      // Redimensionner seulement si nécessaire
+      if (originalWidth > maxDimension || originalHeight > maxDimension) {
+        if (originalWidth >= originalHeight) {
+          // Image horizontale ou carrée - limiter la largeur
+          resizeConfig = [{ resize: { width: maxDimension } }];
+        } else {
+          // Image verticale - limiter la hauteur
+          resizeConfig = [{ resize: { height: maxDimension } }];
+        }
+      }
+
+      // Appliquer la transformation
       const manipulatedImage = await ImageManipulator.manipulateAsync(
         imageUri,
-        [
-          {
-            resize: {
-              width: IMAGE_CONFIG.MAX_WIDTH,
-              height: IMAGE_CONFIG.MAX_HEIGHT,
-            },
-          },
-        ],
+        resizeConfig,
         {
           compress: IMAGE_CONFIG.COMPRESSION_QUALITY,
           format: ImageManipulator.SaveFormat.JPEG,
         }
       );
+
+      console.log(`Image resized: ${originalWidth}x${originalHeight} → ${manipulatedImage.width}x${manipulatedImage.height}`);
 
       // Convertir en base64
       const base64 = await FileSystem.readAsStringAsync(manipulatedImage.uri, {
@@ -103,20 +123,22 @@ class GeminiService {
           return;
         }
 
-        // Redimensionner si nécessaire
-        const maxWidth = IMAGE_CONFIG.MAX_WIDTH;
-        const maxHeight = IMAGE_CONFIG.MAX_HEIGHT;
+        // Redimensionner si nécessaire en préservant le ratio
+        const maxDimension = IMAGE_CONFIG.MAX_DIMENSION;
         
         let { width, height } = img;
         
-        if (width > maxWidth || height > maxHeight) {
-          const ratio = Math.min(maxWidth / width, maxHeight / height);
-          width *= ratio;
-          height *= ratio;
+        // Redimensionner seulement si nécessaire
+        if (width > maxDimension || height > maxDimension) {
+          const ratio = maxDimension / Math.max(width, height);
+          width = Math.round(width * ratio);
+          height = Math.round(height * ratio);
         }
 
         canvas.width = width;
         canvas.height = height;
+        
+        console.log(`Image resized (web): ${img.width}x${img.height} → ${width}x${height}`);
         
         // Dessiner l'image redimensionnée
         ctx.drawImage(img, 0, 0, width, height);
@@ -317,9 +339,9 @@ Criticals requirements:
   /**
    * Méthode de test avec image factice
    */
-  async mockTransform(style: TransformationStyle): Promise<string> {
+  async mockTransform(_style: TransformationStyle): Promise<string> {
     // Simule un délai de traitement
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise<void>(resolve => setTimeout(resolve, 1000));
     
     // Retourne une image de test
     return 'https://picsum.photos/400/600';

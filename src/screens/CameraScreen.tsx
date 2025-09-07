@@ -82,6 +82,10 @@ export const CameraScreen: React.FC = () => {
     }
   };
 
+  const handleHome = () => {
+    navigation.navigate('Home');
+  };
+
   if (hasPermission === null) {
     return (
       <View style={styles.container}>
@@ -117,10 +121,10 @@ export const CameraScreen: React.FC = () => {
         >
         <View style={styles.topControls}>
           <IconButton
-            icon="close"
+            icon="home"
             size={30}
             iconColor="white"
-            onPress={handleClose}
+            onPress={handleHome}
             style={styles.controlButton}
           />
           
