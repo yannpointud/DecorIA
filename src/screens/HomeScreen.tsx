@@ -10,15 +10,15 @@ import {
 import { Button } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { useCamera } from '../hooks/useCamera';
+import { useOrientation } from '../hooks/useOrientation';
 import { theme } from '../constants/theme';
 import { IMAGE_DIMENSIONS } from '../constants/dimensions';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const { width: screenWidth } = Dimensions.get('window');
-
 export const HomeScreen: React.FC = () => {
   const navigation = useNavigation<any>();
   const { pickFromGallery } = useCamera();
+  const { isLandscape } = useOrientation();
 
   const handleCameraPress = () => {
     navigation.navigate('Camera');
@@ -33,44 +33,91 @@ export const HomeScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.centeredContent}>
-        <View style={styles.logoContainer}>
-          <Image 
-            source={require('../../assets/icon.png')} 
-            style={styles.logo}
-            resizeMode="contain"
-          />
-          <Text style={styles.subtitle}>Transformez vos pièces avec l'IA</Text>
-        </View>
+      {isLandscape ? (
+        // Layout paysage : Logo+texte à gauche, boutons à droite
+        <View style={styles.landscapeContent}>
+          <View style={styles.leftSection}>
+            <View style={styles.logoContainer}>
+              <Image 
+                source={require('../../assets/icon.png')} 
+                style={styles.logo}
+                resizeMode="contain"
+              />
+              <Text style={styles.subtitleLandscape}>Transformez vos pièces avec l'IA</Text>
+            </View>
+          </View>
 
-        <View style={styles.buttonsContainer}>
-          <TouchableOpacity 
-            style={[styles.actionButton, styles.cameraButton]}
-            onPress={handleCameraPress}
-            activeOpacity={0.8}
-          >
-            <MaterialCommunityIcons 
-              name="camera" 
-              size={24} 
-              color="#6B7280" 
-            />
-            <Text style={styles.buttonText}>Appareil Photo</Text>
-          </TouchableOpacity>
+          <View style={styles.rightSection}>
+            <View style={styles.buttonsContainer}>
+              <TouchableOpacity 
+                style={[styles.actionButton, styles.cameraButton]}
+                onPress={handleCameraPress}
+                activeOpacity={0.8}
+              >
+                <MaterialCommunityIcons 
+                  name="camera" 
+                  size={24} 
+                  color="#6B7280" 
+                />
+                <Text style={styles.buttonText}>Appareil Photo</Text>
+              </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={[styles.actionButton, styles.galleryButton]}
-            onPress={handleGalleryPress}
-            activeOpacity={0.8}
-          >
-            <MaterialCommunityIcons 
-              name="image" 
-              size={24} 
-              color="#6B7280" 
-            />
-            <Text style={styles.buttonText}>Galerie</Text>
-          </TouchableOpacity>
+              <TouchableOpacity 
+                style={[styles.actionButton, styles.galleryButton]}
+                onPress={handleGalleryPress}
+                activeOpacity={0.8}
+              >
+                <MaterialCommunityIcons 
+                  name="image" 
+                  size={24} 
+                  color="#6B7280" 
+                />
+                <Text style={styles.buttonText}>Galerie</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
-      </View>
+      ) : (
+        // Layout portrait : Layout vertical original
+        <View style={styles.centeredContent}>
+          <View style={styles.logoContainer}>
+            <Image 
+              source={require('../../assets/icon.png')} 
+              style={styles.logo}
+              resizeMode="contain"
+            />
+            <Text style={styles.subtitle}>Transformez vos pièces avec l'IA</Text>
+          </View>
+
+          <View style={styles.buttonsContainer}>
+            <TouchableOpacity 
+              style={[styles.actionButton, styles.cameraButton]}
+              onPress={handleCameraPress}
+              activeOpacity={0.8}
+            >
+              <MaterialCommunityIcons 
+                name="camera" 
+                size={24} 
+                color="#6B7280" 
+              />
+              <Text style={styles.buttonText}>Appareil Photo</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={[styles.actionButton, styles.galleryButton]}
+              onPress={handleGalleryPress}
+              activeOpacity={0.8}
+            >
+              <MaterialCommunityIcons 
+                name="image" 
+                size={24} 
+                color="#6B7280" 
+              />
+              <Text style={styles.buttonText}>Galerie</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
 
       <View style={styles.footerContainer}>
         <Text style={styles.footerText}>Yann POINTUD</Text>
@@ -91,6 +138,24 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  landscapeContent: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 40,
+  },
+  leftSection: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingRight: 20,
+  },
+  rightSection: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingLeft: 20,
+  },
   logoContainer: {
     alignItems: 'center',
     paddingHorizontal: 20,
@@ -106,6 +171,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     opacity: 0.7,
     marginBottom: 40,
+  },
+  subtitleLandscape: {
+    fontSize: 16,
+    color: theme.colors.text,
+    textAlign: 'center',
+    opacity: 0.7,
+    marginBottom: 0,
   },
   buttonsContainer: {
     paddingHorizontal: 20,

@@ -9,30 +9,34 @@ interface StyleCardProps {
   style: TransformationStyle;
   selected: boolean;
   onPress: () => void;
+  landscapeWidth?: number;
 }
 
 export const StyleCard: React.FC<StyleCardProps> = ({
   style,
   selected,
   onPress,
+  landscapeWidth,
 }) => {
+  const isLandscape = !!landscapeWidth;
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
       <Card style={[
         styles.card, 
+        landscapeWidth ? { width: landscapeWidth, margin: 3, padding: 8 } : null,
         selected ? [styles.selectedCard, { borderColor: style.color }] : styles.unselectedCard
       ]}>
         <View style={styles.cardContent}>
           <View
             style={[
-              styles.iconContainer,
+              isLandscape ? styles.iconContainerLandscape : styles.iconContainer,
               { backgroundColor: style.color },
               selected ? styles.selectedIconContainer : styles.unselectedIconContainer,
             ]}
           >
             <MaterialCommunityIcons
               name={style.icon as any}
-              size={24}
+              size={isLandscape ? 20 : 24}
               color="white"
             />
           </View>
@@ -80,6 +84,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
+  },
+  iconContainerLandscape: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
   },
   selectedIconContainer: {
     transform: [{ scale: 1.1 }],

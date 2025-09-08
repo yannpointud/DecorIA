@@ -13,15 +13,15 @@ import { Button, Appbar } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { useAppContext } from '../contexts/AppContext';
 import { useImageTransform } from '../hooks/useImageTransform';
+import { useOrientation } from '../hooks/useOrientation';
 import { StyleCard } from '../components/StyleCard';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import { AdaptiveImage } from '../components/AdaptiveImage';
 import { TRANSFORMATION_STYLES } from '../constants/styles';
 
-const { width: screenWidth } = Dimensions.get('window');
-
 export const TransformScreen: React.FC = () => {
   const navigation = useNavigation<any>();
+  const { isLandscape, dimensions } = useOrientation();
   const {
     originalImage,
     selectedStyle,
@@ -45,7 +45,7 @@ export const TransformScreen: React.FC = () => {
 
   // Animation fluide du progrès
   useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
+    let interval: ReturnType<typeof setInterval> | null = null;
     
     // Phases : 0% → 50% (jalons réels) → 50% → 90% (animation) → 90% → 100% (jalons finaux)
     if (realProgress >= 0.4 && realProgress < 0.8 && localLoading) {
@@ -132,50 +132,113 @@ export const TransformScreen: React.FC = () => {
         />
       </Appbar.Header>
 
-      <ScrollView contentContainerStyle={styles.content}>
-        <AdaptiveImage
-          source={{ uri: originalImage }}
-          showLabel="Photo originale"
-          containerStyle={styles.imageContainer}
-        />
+      <ScrollView contentContainerStyle={[
+        styles.content,
+        isLandscape && styles.contentLandscape
+      ]}>
+        {isLandscape ? (
+          <View style={styles.landscapeContainer}>
+            {/* Image à gauche */}
+            <View style={styles.imageSection}>
+              <AdaptiveImage
+                source={{ uri: originalImage }}
+                showLabel="Photo originale"
+                containerStyle={styles.imageContainerLandscape}
+              />
+            </View>
+            
+            {/* Styles à droite */}
+            <View style={styles.stylesSection}>
+              <ScrollView style={styles.stylesScrollView}>
+                <View style={styles.stylesGridLandscape}>
+                  {TRANSFORMATION_STYLES.map((style) => {
+                    // Calculer largeur pour 2 colonnes dans l'espace droit (50% de l'écran - padding)
+                    const landscapeCardWidth = (dimensions.width * 0.5 - 64) / 2 - 6; // 50% écran - padding total / 2 colonnes - margin
+                    return (
+                      <StyleCard
+                        key={style.id}
+                        style={style}
+                        selected={selectedStyle?.id === style.id}
+                        onPress={() => setSelectedStyle(style)}
+                        landscapeWidth={landscapeCardWidth}
+                      />
+                    );
+                  })}
+                </View>
+                
+                {error && (
+                  <View style={styles.errorContainer}>
+                    <Text style={styles.errorText}>{error}</Text>
+                  </View>
+                )}
+              </ScrollView>
 
-        <Text style={styles.sectionTitle}>Sélectionnez un style :</Text>
-
-        <View style={styles.stylesGrid}>
-          {TRANSFORMATION_STYLES.map((style) => (
-            <StyleCard
-              key={style.id}
-              style={style}
-              selected={selectedStyle?.id === style.id}
-              onPress={() => setSelectedStyle(style)}
-            />
-          ))}
-        </View>
-
-        {error && (
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>{error}</Text>
+              <View style={styles.buttonContainer}>
+                <Button
+                  mode="contained"
+                  onPress={() => {
+                    console.log('🔥 BUTTON PRESSED!');
+                    console.log('🔥 selectedStyle exists:', !!selectedStyle);
+                    console.log('🔥 isLoading:', isLoading);
+                    console.log('🔥 button disabled:', !selectedStyle || isLoading);
+                    handleTransform();
+                  }}
+                  disabled={!selectedStyle || localLoading || isLoading}
+                  style={styles.transformButton}
+                  contentStyle={styles.transformButtonContent}
+                  loading={localLoading || isLoading}
+                >
+                  {(localLoading || isLoading) ? 'Transformation...' : 'Transformer'}
+                </Button>
+              </View>
+            </View>
           </View>
-        )}
+        ) : (
+          // Layout portrait (actuel)
+          <>
+            <AdaptiveImage
+              source={{ uri: originalImage }}
+              showLabel="Photo originale"
+              containerStyle={styles.imageContainer}
+            />
 
-        <View style={styles.buttonContainer}>
-          <Button
-            mode="contained"
-            onPress={() => {
-              console.log('🔥 BUTTON PRESSED!');
-              console.log('🔥 selectedStyle exists:', !!selectedStyle);
-              console.log('🔥 isLoading:', isLoading);
-              console.log('🔥 button disabled:', !selectedStyle || isLoading);
-              handleTransform();
-            }}
-            disabled={!selectedStyle || localLoading || isLoading}
-            style={styles.transformButton}
-            contentStyle={styles.transformButtonContent}
-            loading={localLoading || isLoading}
-          >
-            {(localLoading || isLoading) ? 'Transformation...' : 'Transformer'}
-          </Button>
-        </View>
+            <View style={styles.stylesGrid}>
+              {TRANSFORMATION_STYLES.map((style) => (
+                <StyleCard
+                  key={style.id}
+                  style={style}
+                  selected={selectedStyle?.id === style.id}
+                  onPress={() => setSelectedStyle(style)}
+                />
+              ))}
+            </View>
+
+            {error && (
+              <View style={styles.errorContainer}>
+                <Text style={styles.errorText}>{error}</Text>
+              </View>
+            )}
+
+            <View style={styles.buttonContainer}>
+              <Button
+                mode="contained"
+                onPress={() => {
+                  console.log('🔥 BUTTON PRESSED!');
+                  console.log('🔥 selectedStyle exists:', !!selectedStyle);
+                  console.log('🔥 isLoading:', isLoading);
+                  console.log('🔥 button disabled:', !selectedStyle || isLoading);
+                  handleTransform();
+                }}
+                disabled={!selectedStyle || localLoading || isLoading}
+                style={styles.transformButton}
+                contentStyle={styles.transformButtonContent}
+                loading={localLoading || isLoading}
+              >
+                {(localLoading || isLoading) ? 'Transformation...' : 'Transformer'}
+              </Button>
+            </View>
+          </>
+        )}
       </ScrollView>
 
       <LoadingOverlay
@@ -195,8 +258,41 @@ const styles = StyleSheet.create({
   content: {
     paddingBottom: 20,
   },
+  contentLandscape: {
+    paddingBottom: 0,
+    flexGrow: 1,
+  },
+  landscapeContainer: {
+    flexDirection: 'row',
+    flex: 1,
+    paddingHorizontal: 0,
+    paddingTop: 0,
+  },
+  imageSection: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    paddingRight: 0,
+    paddingTop: 16,
+  },
+  stylesSection: {
+    flex: 1,
+    paddingLeft: 8,
+    paddingRight: 12,
+    paddingTop: 8,
+    justifyContent: 'flex-start',
+  },
+  stylesScrollView: {
+    flex: 1,
+    marginBottom: 4,
+  },
   imageContainer: {
     margin: 16,
+  },
+  imageContainerLandscape: {
+    margin: 0,
+    marginVertical: 0,
+    marginHorizontal: 0,
   },
   sectionTitle: {
     fontSize: 18,
@@ -212,6 +308,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     paddingHorizontal: 8,
   },
+  stylesGridLandscape: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+  },
   errorContainer: {
     backgroundColor: '#ffebee',
     padding: 12,
@@ -226,7 +328,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     padding: 16,
-    marginTop: 16,
+    marginTop: 0,
   },
   transformButton: {
     borderRadius: 25,

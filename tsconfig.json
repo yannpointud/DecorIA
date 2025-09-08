@@ -5,11 +5,11 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "jsx": "react-native",
-    "lib": ["es2017"],
+    "lib": ["es2017", "dom"],
     "types": ["react-native", "react"],
     "baseUrl": ".",
     "paths": {

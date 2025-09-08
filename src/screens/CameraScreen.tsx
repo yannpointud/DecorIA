@@ -62,7 +62,7 @@ export const CameraScreen: React.FC = () => {
   };
 
   const toggleCameraType = () => {
-    setCameraType((current: string) =>
+    setCameraType((current) =>
       current === 'back' ? 'front' : 'back'
     );
   };
@@ -116,7 +116,7 @@ export const CameraScreen: React.FC = () => {
         <CameraView 
           ref={cameraRef}
           style={styles.camera} 
-          facing={cameraType}
+          facing={cameraType as any}
           ratio={aspectRatio}
         >
         <View style={styles.topControls}>

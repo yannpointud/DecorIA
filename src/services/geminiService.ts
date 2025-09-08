@@ -19,7 +19,6 @@ interface GeminiRequest {
   generationConfig?: {
     temperature?: number;
     topP?: number;
-    topK?: number;
     maxOutputTokens?: number;
   };
 }
@@ -219,8 +218,7 @@ Criticals requirements:
         generationConfig: {
           temperature: 0,
           topP: 0.95,
-          topK: 40,
-          maxOutputTokens: 8192,
+          maxOutputTokens: 32768,
         }
       };
 

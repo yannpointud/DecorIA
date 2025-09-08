@@ -11,17 +11,17 @@ export const TRANSFORMATION_STYLES: TransformationStyle[] = [
   {
     id: 'tidy',
     name: 'Rangée',
-    prompt: `Your primary task is to digitally tidy this room. You must identify and remove all clutter while preserving the main furniture and the room's structure.
+    prompt: `Your task is to digitally tidy this room: You must identify and remove all clutter while preserving the main furniture and the room's structure.
 
 **Specific actions required:**
-1.  **Clear all surfaces:** Remove any loose items from the floor, chairs, sofas, tables, and desks.
+1.  **Clear ALL surfaces:** Remove any loose items from the floor, chairs, sofas, tables, and desks.
 2.  **Make the bed:** If there is a bed, it must be neatly made, with the covers smooth and pillows arranged.
 3.  **Close everything:** Ensure all drawers, cabinets, and wardrobe doors are fully closed.
 
-**Crucial Rule:** You are an editor, not a creator. **DO NOT** add, replace, or significantly alter the existing furniture. A messy chair should become the *exact same chair*, but with the clothes removed from it. The final image must be the same room, just perfectly clean and organized.`,
+**Crucial Rule:** **DO NOT** add, replace, or significantly alter the existing furniture. A messy chair should become the *exact same chair*, but with the clothes removed from it. The final image must be the same room, just perfectly clean and organized.`,
     icon: 'broom',
     color: '#4CAF50',
-    description: 'Espace organisé'
+    description: 'Espace rangé organisé'
   },
   {
     id: 'empty',
