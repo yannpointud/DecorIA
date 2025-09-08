@@ -9,6 +9,7 @@ interface AppState {
   isLoading: boolean;
   loadingProgress: number;
   error: string | null;
+  customPrompt: string | null;
 }
 
 interface AppContextType extends AppState {
@@ -19,6 +20,8 @@ interface AppContextType extends AppState {
   setIsLoading: (loading: boolean) => void;
   setLoadingProgress: (progress: number) => void;
   setError: (error: string | null) => void;
+  setCustomPrompt: (prompt: string | null) => void;
+  clearCustomPrompt: () => void;
   resetState: () => void;
 }
 
@@ -30,6 +33,7 @@ const initialState: AppState = {
   isLoading: false,
   loadingProgress: 0,
   error: null,
+  customPrompt: null,
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -65,6 +69,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setState(prev => ({ ...prev, error, isLoading: false }));
   };
 
+  const setCustomPrompt = (prompt: string | null) => {
+    setState(prev => ({ ...prev, customPrompt: prompt }));
+  };
+
+  const clearCustomPrompt = () => {
+    setState(prev => ({ ...prev, customPrompt: null }));
+  };
+
   const resetState = () => {
     setState(initialState);
   };
@@ -78,6 +90,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setIsLoading,
     setLoadingProgress,
     setError,
+    setCustomPrompt,
+    clearCustomPrompt,
     resetState,
   };
 

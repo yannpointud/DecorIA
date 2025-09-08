@@ -69,5 +69,13 @@ The final image must be the empty architectural shell of the exact same room.`,
     icon: 'circle-outline',
     color: '#607D8B',
     description: 'Design épuré et zen'
+  },
+  {
+    id: 'custom',
+    name: 'Sur mesure',
+    prompt: 'Transforme cette pièce en ',
+    icon: 'pencil-outline',
+    color: '#FF5722',
+    description: 'Votre vision personnalisée'
   }
 ];

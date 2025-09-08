@@ -10,6 +10,8 @@ export const useImageTransform = () => {
   const {
     originalImage,
     selectedStyle,
+    customPrompt,
+    clearCustomPrompt,
     setTransformedImage,
     setIsLoading,
     setLoadingProgress,
@@ -18,8 +20,11 @@ export const useImageTransform = () => {
 
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const transformImage = useCallback(async () => {
-    if (!originalImage || !selectedStyle) {
+  const transformImage = useCallback(async (overrideStyle?: TransformationStyle, overridePrompt?: string) => {
+    const effectiveSelectedStyle = overrideStyle || selectedStyle;
+    const effectiveCustomPrompt = overridePrompt || customPrompt;
+    
+    if (!originalImage || !effectiveSelectedStyle) {
       setError('Image ou style manquant');
       return false;
     }
@@ -30,10 +35,15 @@ export const useImageTransform = () => {
     setError(null);
 
     try {
+      // Utiliser le prompt personnalisé si défini, sinon le prompt du style
+      const effectiveStyle = effectiveCustomPrompt && effectiveSelectedStyle?.id === 'custom'
+        ? { ...effectiveSelectedStyle, prompt: effectiveCustomPrompt }
+        : effectiveSelectedStyle;
+
       // Transformation via Gemini
       const transformedUri = await geminiService.transformImage(
         originalImage,
-        selectedStyle,
+        effectiveStyle!,
         (progress) => setLoadingProgress(progress)
       );
 
@@ -62,6 +72,12 @@ export const useImageTransform = () => {
       }
 
       setLoadingProgress(1);
+      
+      // Nettoyer le prompt personnalisé après une transformation réussie
+      if (effectiveCustomPrompt && effectiveSelectedStyle?.id === 'custom') {
+        clearCustomPrompt();
+      }
+      
       return true;
     } catch (error) {
       console.error('Transform error:', error);
@@ -71,10 +87,13 @@ export const useImageTransform = () => {
       setIsProcessing(false);
       setIsLoading(false);
     }
-  }, [originalImage, selectedStyle, setTransformedImage, setIsLoading, setLoadingProgress, setError]);
+  }, [originalImage, selectedStyle, customPrompt, clearCustomPrompt, setTransformedImage, setIsLoading, setLoadingProgress, setError]);
 
-  const mockTransform = useCallback(async () => {
-    if (!selectedStyle) return false;
+  const mockTransform = useCallback(async (overrideStyle?: TransformationStyle, overridePrompt?: string) => {
+    const effectiveSelectedStyle = overrideStyle || selectedStyle;
+    const effectiveCustomPrompt = overridePrompt || customPrompt;
+    
+    if (!effectiveSelectedStyle) return false;
 
     console.log('Mock transform started'); // Debug
     setIsProcessing(true);
@@ -82,13 +101,24 @@ export const useImageTransform = () => {
     setLoadingProgress(0);
 
     try {
+      // Utiliser le prompt personnalisé si défini, sinon le prompt du style
+      const effectiveStyle = effectiveCustomPrompt && effectiveSelectedStyle?.id === 'custom'
+        ? { ...effectiveSelectedStyle, prompt: effectiveCustomPrompt }
+        : effectiveSelectedStyle;
+
       console.log('Calling gemini mock service...'); // Debug
-      const mockUri = await geminiService.mockTransform(selectedStyle);
+      const mockUri = await geminiService.mockTransform(effectiveStyle);
       console.log('Mock URI received:', mockUri); // Debug
       
       // Pas d'optimisation pour le mock, juste l'URL directe
       setTransformedImage(mockUri);
       setLoadingProgress(1);
+      
+      // Nettoyer le prompt personnalisé après une transformation réussie
+      if (effectiveCustomPrompt && effectiveSelectedStyle?.id === 'custom') {
+        clearCustomPrompt();
+      }
+      
       console.log('Mock transform completed'); // Debug
       return true;
     } catch (error) {
@@ -100,7 +130,7 @@ export const useImageTransform = () => {
       setIsLoading(false);
       console.log('Mock transform cleanup done'); // Debug
     }
-  }, [selectedStyle, setTransformedImage, setIsLoading, setLoadingProgress, setError]);
+  }, [selectedStyle, customPrompt, clearCustomPrompt, setTransformedImage, setIsLoading, setLoadingProgress, setError]);
 
   return {
     transformImage,

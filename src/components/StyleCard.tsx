@@ -19,6 +19,7 @@ export const StyleCard: React.FC<StyleCardProps> = ({
   landscapeWidth,
 }) => {
   const isLandscape = !!landscapeWidth;
+
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
       <Card style={[
@@ -47,7 +48,9 @@ export const StyleCard: React.FC<StyleCardProps> = ({
             ]}>
               {style.name}
             </Text>
-            <Text style={styles.description}>{style.description}</Text>
+            <Text style={styles.description} numberOfLines={2}>
+              {style.description}
+            </Text>
           </View>
         </View>
       </Card>

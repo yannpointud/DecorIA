@@ -161,7 +161,14 @@ class GeminiService {
    * Construit le prompt complet pour la transformation
    */
   private buildPrompt(style: TransformationStyle): string {
-    return `Generate a transformed image of this room. ${style.prompt}
+    let transformationPrompt = style.prompt;
+    
+    // Détecter si c'est un prompt personnalisé et ajouter le préfixe automatiquement
+    if (style.id === 'custom') {
+      transformationPrompt = `Transformes cette pièce en suivant ces instructions : ${style.prompt}`;
+    }
+    
+    return `Generate a transformed image of this room. ${transformationPrompt}
 
 Criticals requirements:
 - Generate and return ONLY the transformed image

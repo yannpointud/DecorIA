@@ -18,6 +18,7 @@ import { useOrientation } from '../hooks/useOrientation';
 import { StyleCard } from '../components/StyleCard';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import { AdaptiveImage } from '../components/AdaptiveImage';
+import { CustomPromptModal } from '../components/CustomPromptModal';
 import { TRANSFORMATION_STYLES } from '../constants/styles';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -38,6 +39,7 @@ export const TransformScreen: React.FC = () => {
   const [localLoading, setLocalLoading] = useState(false); // Local state pour affichage immédiat
   const [smoothProgress, setSmoothProgress] = useState(0); // Animation fluide
   const [realProgress, setRealProgress] = useState(0); // Vrai progrès API
+  const [showCustomModal, setShowCustomModal] = useState(false);
 
   useEffect(() => {
     if (!originalImage) {
@@ -119,6 +121,53 @@ export const TransformScreen: React.FC = () => {
     navigation.navigate('Camera');
   };
 
+  const handleStyleSelect = (style: any) => {
+    if (style.id === 'custom') {
+      // Le style personnalisé ouvre directement la modal
+      setShowCustomModal(true);
+    } else {
+      // Les autres styles sont sélectionnables normalement
+      setSelectedStyle(style);
+    }
+  };
+
+  const handleCustomPromptConfirm = async (customPrompt: string) => {
+    const customStyle = TRANSFORMATION_STYLES.find(s => s.id === 'custom') || null;
+    setShowCustomModal(false);
+    
+    // Transformation directe avec le prompt personnalisé
+    if (customStyle) {
+      console.log('🔥 Custom transform started');
+      console.log('🔥 customPrompt:', customPrompt);
+      
+      // Active le loading local IMMÉDIATEMENT
+      setLocalLoading(true);
+      setSmoothProgress(0);
+      setRealProgress(0);
+      
+      try {
+        const success = useMockApi 
+          ? await mockTransform(customStyle, customPrompt)
+          : await transformImage(customStyle, customPrompt);
+
+        console.log('🔥 custom transform success:', success);
+
+        if (success) {
+          navigation.navigate('Result');
+        }
+      } finally {
+        // Désactive le loading local
+        setLocalLoading(false);
+        setSmoothProgress(0);
+        setRealProgress(0);
+      }
+    }
+  };
+
+  const handleCustomPromptCancel = () => {
+    setShowCustomModal(false);
+  };
+
   if (!originalImage) {
     return null;
   }
@@ -179,8 +228,8 @@ export const TransformScreen: React.FC = () => {
                       <StyleCard
                         key={style.id}
                         style={style}
-                        selected={selectedStyle?.id === style.id}
-                        onPress={() => setSelectedStyle(style)}
+                        selected={style.id !== 'custom' && selectedStyle?.id === style.id}
+                        onPress={() => handleStyleSelect(style)}
                         landscapeWidth={landscapeCardWidth}
                       />
                     );
@@ -228,8 +277,8 @@ export const TransformScreen: React.FC = () => {
                 <StyleCard
                   key={style.id}
                   style={style}
-                  selected={selectedStyle?.id === style.id}
-                  onPress={() => setSelectedStyle(style)}
+                  selected={style.id !== 'custom' && selectedStyle?.id === style.id}
+                  onPress={() => handleStyleSelect(style)}
                 />
               ))}
             </View>
@@ -266,6 +315,13 @@ export const TransformScreen: React.FC = () => {
         visible={localLoading || isLoading}
         progress={smoothProgress}
         message="Transformation en cours..."
+      />
+
+      <CustomPromptModal
+        visible={showCustomModal}
+        onDismiss={handleCustomPromptCancel}
+        onConfirm={handleCustomPromptConfirm}
+        isLoading={localLoading || isLoading}
       />
     </View>
   );
