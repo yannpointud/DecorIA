@@ -341,11 +341,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
   },
   content: {
-    marginTop: 20,
+    marginTop: 30,
     paddingBottom: 20,
   },
   contentLandscape: {
-    marginTop: 20,
+    marginTop: 12,
     paddingBottom: 0,
     flexGrow: 1,
   },
