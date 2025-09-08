@@ -11,7 +11,7 @@ import {
 import { IconButton } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useOrientation } from '../hooks/useOrientation';
-import { AdaptiveImage } from './AdaptiveImage';
+import { ZoomableImage } from './ZoomableImage';
 
 interface ImageComparisonProps {
   beforeImage: string;
@@ -60,7 +60,7 @@ export const ImageComparison: React.FC<ImageComparisonProps> = ({
 
   return (
     <View style={styles.simpleContainer}>
-      <AdaptiveImage
+      <ZoomableImage
         source={{ uri: afterImage }}
         showLabel="Image transformée"
         maxWidth={maxWidth}
