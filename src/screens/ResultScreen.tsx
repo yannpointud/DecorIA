@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -10,13 +10,22 @@ import { useNavigation } from '@react-navigation/native';
 import { useAppContext } from '../contexts/AppContext';
 import { useOrientation } from '../hooks/useOrientation';
 import { ImageComparison } from '../components/ImageComparison';
+import { LoadingOverlay } from '../components/LoadingOverlay';
 import imageService from '../services/imageService';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export const ResultScreen: React.FC = () => {
   const navigation = useNavigation<any>();
-  const { originalImage, transformedImage, resetState } = useAppContext();
+  const { 
+    originalImage, 
+    transformedImage, 
+    resetState, 
+    retryTransformation, 
+    isLoading, 
+    loadingProgress 
+  } = useAppContext();
   const { isLandscape } = useOrientation();
+  const [isRetrying, setIsRetrying] = useState(false);
 
   const handleSave = async () => {
     if (!transformedImage) return;
@@ -27,6 +36,18 @@ export const ResultScreen: React.FC = () => {
     }
   };
 
+  const handleRetry = async () => {
+    setIsRetrying(true);
+    try {
+      const success = await retryTransformation();
+      if (!success) {
+        // Error is handled by context, just stay on screen
+        console.log('Retry failed, staying on result screen');
+      }
+    } finally {
+      setIsRetrying(false);
+    }
+  };
 
   const handleNewPhoto = () => {
     resetState();
@@ -86,6 +107,27 @@ export const ResultScreen: React.FC = () => {
       >
         <MaterialCommunityIcons name="download" size={24} color="#333" />
       </TouchableOpacity>
+
+      {/* Bouton retry - bas droite */}
+      <TouchableOpacity 
+        style={styles.floatingRetryButton} 
+        onPress={handleRetry}
+        activeOpacity={0.8}
+        disabled={isLoading || isRetrying}
+      >
+        <MaterialCommunityIcons 
+          name="refresh" 
+          size={24} 
+          color={isLoading || isRetrying ? "#999" : "#333"} 
+        />
+      </TouchableOpacity>
+
+      {/* Loading overlay pour retry */}
+      <LoadingOverlay
+        visible={isLoading || isRetrying}
+        progress={loadingProgress}
+        message="Nouvelle transformation..."
+      />
     </View>
   );
 };
@@ -139,6 +181,26 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 16,
     left: 16,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    zIndex: 10,
+  },
+  floatingRetryButton: {
+    position: 'absolute',
+    bottom: 16,
+    right: 16,
     width: 48,
     height: 48,
     borderRadius: 24,

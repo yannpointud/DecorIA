@@ -170,7 +170,7 @@ class GeminiService {
     
     return `Generate a transformed image of this room. ${transformationPrompt}
 
-Criticals requirements:
+CRITICALS requirements:
 - Generate and return ONLY the transformed image
 - Maintain the exact same perspective and camera angle
 - Keep the same room dimensions and all architectural features

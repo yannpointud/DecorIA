@@ -1,5 +1,8 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { TransformationStyle } from '../constants/styles';
+import geminiService from '../services/geminiService';
+import imageService from '../services/imageService';
+import storageService from '../services/storageService';
 
 interface AppState {
   originalImage: string | null;
@@ -23,6 +26,9 @@ interface AppContextType extends AppState {
   setCustomPrompt: (prompt: string | null) => void;
   clearCustomPrompt: () => void;
   resetState: () => void;
+  transformImage: (overrideStyle?: TransformationStyle, overridePrompt?: string) => Promise<boolean>;
+  retryTransformation: () => Promise<boolean>;
+  mockTransform: (overrideStyle?: TransformationStyle, overridePrompt?: string) => Promise<boolean>;
 }
 
 const initialState: AppState = {
@@ -81,6 +87,123 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setState(initialState);
   };
 
+  const transformImage = async (overrideStyle?: TransformationStyle, overridePrompt?: string): Promise<boolean> => {
+    const effectiveSelectedStyle = overrideStyle || state.selectedStyle;
+    const effectiveCustomPrompt = overridePrompt || state.customPrompt;
+    
+    if (!state.originalImage || !effectiveSelectedStyle) {
+      setError('Image ou style manquant');
+      return false;
+    }
+
+    setIsLoading(true);
+    setLoadingProgress(0);
+    setError(null);
+
+    try {
+      // Utiliser le prompt personnalisé si défini, sinon le prompt du style
+      const effectiveStyle = effectiveCustomPrompt && effectiveSelectedStyle?.id === 'custom'
+        ? { ...effectiveSelectedStyle, prompt: effectiveCustomPrompt }
+        : effectiveSelectedStyle;
+
+      // Transformation via Gemini
+      const transformedUri = await geminiService.transformImage(
+        state.originalImage,
+        effectiveStyle!,
+        (progress) => setLoadingProgress(progress)
+      );
+
+      // Si c'est du base64, convertir en URI locale (seulement sur mobile)
+      let finalUri = transformedUri;
+      if (transformedUri.startsWith('data:image') && typeof window === 'undefined') {
+        // Seulement sur mobile - sur web on peut utiliser directement les data URIs
+        finalUri = await imageService.base64ToUri(transformedUri);
+      }
+
+      // Optimiser pour l'affichage (seulement sur mobile)
+      let optimizedUri = finalUri;
+      if (typeof window === 'undefined') {
+        optimizedUri = await imageService.optimizeImageForDisplay(finalUri);
+      }
+      
+      setTransformedImage(optimizedUri);
+
+      // Sauvegarder dans l'historique (seulement sur mobile, pas sur web à cause des quotas)
+      if (typeof window === 'undefined') {
+        await storageService.saveTransformation(
+          state.originalImage,
+          optimizedUri,
+          effectiveSelectedStyle.id
+        );
+      }
+
+      setLoadingProgress(1);
+      
+      // Nettoyer le prompt personnalisé après une transformation réussie
+      if (effectiveCustomPrompt && effectiveSelectedStyle?.id === 'custom') {
+        clearCustomPrompt();
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('Transform error:', error);
+      setError(error instanceof Error ? error.message : 'Erreur de transformation');
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const retryTransformation = async (): Promise<boolean> => {
+    if (!state.originalImage || !state.selectedStyle) {
+      setError('Impossible de relancer : données manquantes');
+      return false;
+    }
+    
+    return await transformImage(state.selectedStyle, state.customPrompt || undefined);
+  };
+
+  const mockTransform = async (overrideStyle?: TransformationStyle, overridePrompt?: string): Promise<boolean> => {
+    const effectiveSelectedStyle = overrideStyle || state.selectedStyle;
+    const effectiveCustomPrompt = overridePrompt || state.customPrompt;
+    
+    if (!effectiveSelectedStyle) return false;
+
+    console.log('Mock transform started');
+    setIsLoading(true);
+    setLoadingProgress(0);
+
+    try {
+      // Utiliser le prompt personnalisé si défini, sinon le prompt du style
+      const effectiveStyle = effectiveCustomPrompt && effectiveSelectedStyle?.id === 'custom'
+        ? { ...effectiveSelectedStyle, prompt: effectiveCustomPrompt }
+        : effectiveSelectedStyle;
+
+      console.log('Calling gemini mock service...');
+      const mockUri = await geminiService.mockTransform(effectiveStyle);
+      console.log('Mock URI received:', mockUri);
+      
+      // Pas d'optimisation pour le mock, juste l'URL directe
+      setTransformedImage(mockUri);
+      setLoadingProgress(1);
+      
+      // Nettoyer le prompt personnalisé après une transformation réussie
+      if (effectiveCustomPrompt && effectiveSelectedStyle?.id === 'custom') {
+        clearCustomPrompt();
+      }
+      
+      console.log('Mock transform completed');
+      return true;
+    } catch (error) {
+      console.error('Mock transform error:', error);
+      setError('Erreur lors du test');
+      return false;
+    } finally {
+      setIsLoading(false);
+      console.log('Mock transform cleanup done');
+    }
+  };
+
   const value: AppContextType = {
     ...state,
     setOriginalImage,
@@ -93,6 +216,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setCustomPrompt,
     clearCustomPrompt,
     resetState,
+    transformImage,
+    retryTransformation,
+    mockTransform,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

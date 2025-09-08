@@ -28,7 +28,8 @@ export const CameraScreen: React.FC = () => {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [cameraType, setCameraType] = useState('back');
   const [isCapturing, setIsCapturing] = useState(false);
-  const [aspectRatio, setAspectRatio] = useState<CameraRatio>('4:3'); // Par défaut 4:3
+  const [aspectRatio, setAspectRatio] = useState<CameraRatio>('16:9'); // Par défaut 16:9
+  const [zoom, setZoom] = useState(0); // Zoom de 0 à 1 (0 = dézoom maximum)
 
   const [permission, requestPermission] = useCameraPermissions();
 
@@ -86,6 +87,7 @@ export const CameraScreen: React.FC = () => {
     navigation.navigate('Home');
   };
 
+
   if (hasPermission === null) {
     return (
       <View style={styles.container}>
@@ -118,6 +120,7 @@ export const CameraScreen: React.FC = () => {
           style={styles.camera} 
           facing={cameraType as any}
           ratio={aspectRatio}
+          zoom={zoom}
         >
         <View style={styles.topControls}>
           <IconButton
@@ -177,7 +180,21 @@ export const CameraScreen: React.FC = () => {
             <View style={styles.captureButtonInner} />
           </TouchableOpacity>
           
-          <View style={{ width: 50 }} />
+          {/* Boutons zoom */}
+          <View style={styles.zoomContainer}>
+            <TouchableOpacity 
+              style={styles.zoomButton}
+              onPress={() => setZoom(Math.min(1, zoom + 0.1))}
+            >
+              <Text style={styles.zoomButtonText}>+</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.zoomButton}
+              onPress={() => setZoom(Math.max(0, zoom - 0.1))}
+            >
+              <Text style={styles.zoomButtonText}>−</Text>
+            </TouchableOpacity>
+          </View>
         </View>
         </CameraView>
       )}
@@ -271,5 +288,26 @@ const styles = StyleSheet.create({
   },
   ratioButtonTextSelected: {
     color: 'black',
+  },
+  zoomContainer: {
+    alignItems: 'center',
+    width: 50,
+    gap: 8,
+  },
+  zoomButton: {
+    width: 40,
+    height: 40,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.3)',
+  },
+  zoomButtonText: {
+    color: 'white',
+    fontSize: 20,
+    fontWeight: '700',
+    lineHeight: 20,
   },
 });
