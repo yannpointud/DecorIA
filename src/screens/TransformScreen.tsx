@@ -4,13 +4,11 @@ import {
   View,
   StyleSheet,
   ScrollView,
-  Image,
   Text,
   Alert,
-  Dimensions,
   TouchableOpacity,
 } from 'react-native';
-import { Button, Appbar } from 'react-native-paper';
+import { Button } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { useAppContext } from '../contexts/AppContext';
 import { useImageTransform } from '../hooks/useImageTransform';
@@ -29,13 +27,12 @@ export const TransformScreen: React.FC = () => {
     originalImage,
     selectedStyle,
     setSelectedStyle,
-    captureAspectRatio,
     isLoading,
     loadingProgress,
     error,
   } = useAppContext();
   const { transformImage, mockTransform } = useImageTransform();
-  const [useMockApi, setUseMockApi] = useState(false); // Use real API by default
+  const [useMockApi] = useState(false); // Use real API by default
   const [localLoading, setLocalLoading] = useState(false); // Local state pour affichage immédiat
   const [smoothProgress, setSmoothProgress] = useState(0); // Animation fluide
   const [realProgress, setRealProgress] = useState(0); // Vrai progrès API
@@ -174,16 +171,6 @@ export const TransformScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      {!isLandscape && (
-        <Appbar.Header>
-          <Appbar.BackAction onPress={() => navigation.goBack()} />
-          <Appbar.Content title="Choisir un style" />
-          <Appbar.Action 
-            icon="camera" 
-            onPress={handleRetake}
-          />
-        </Appbar.Header>
-      )}
 
       <ScrollView contentContainerStyle={[
         styles.content,
@@ -196,25 +183,26 @@ export const TransformScreen: React.FC = () => {
               <AdaptiveImage
                 source={{ uri: originalImage }}
                 showLabel="Photo originale"
+                maxWidth={dimensions.width * 0.5 - 16} // 50% largeur écran pour paysage
+                maxHeight={dimensions.height - 32} // Hauteur écran moins marges
                 containerStyle={styles.imageContainerLandscape}
               />
-              {/* Boutons flottants en paysage */}
-              <View style={styles.floatingButtons}>
-                <TouchableOpacity 
-                  style={styles.floatingButton} 
-                  onPress={() => navigation.goBack()}
-                  activeOpacity={0.8}
-                >
-                  <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
-                </TouchableOpacity>
-                <TouchableOpacity 
-                  style={styles.floatingButton} 
-                  onPress={handleRetake}
-                  activeOpacity={0.8}
-                >
-                  <MaterialCommunityIcons name="camera" size={24} color="#333" />
-                </TouchableOpacity>
-              </View>
+              {/* Bouton retour flottant en paysage */}
+              <TouchableOpacity 
+                style={styles.floatingBackButton} 
+                onPress={() => navigation.goBack()}
+                activeOpacity={0.8}
+              >
+                <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
+              </TouchableOpacity>
+              {/* Bouton caméra flottant sur l'image */}
+              <TouchableOpacity 
+                style={styles.floatingCameraButton} 
+                onPress={handleRetake}
+                activeOpacity={0.8}
+              >
+                <MaterialCommunityIcons name="camera" size={24} color="#333" />
+              </TouchableOpacity>
             </View>
             
             {/* Styles à droite */}
@@ -243,7 +231,7 @@ export const TransformScreen: React.FC = () => {
                 )}
               </ScrollView>
 
-              <View style={styles.buttonContainer}>
+              <View style={[styles.buttonContainer, isLandscape && styles.buttonContainerLandscape]}>
                 <Button
                   mode="contained"
                   onPress={() => {
@@ -266,11 +254,31 @@ export const TransformScreen: React.FC = () => {
         ) : (
           // Layout portrait (actuel)
           <>
-            <AdaptiveImage
-              source={{ uri: originalImage }}
-              showLabel="Photo originale"
-              containerStyle={styles.imageContainer}
-            />
+            <View style={styles.imageSection}>
+              <AdaptiveImage
+                source={{ uri: originalImage }}
+                showLabel="Photo originale"
+                maxWidth={dimensions.width - 16} // Largeur écran moins petite marge
+                maxHeight={450} // Plus de hauteur que la valeur par défaut
+                containerStyle={styles.imageContainer}
+              />
+              {/* Bouton retour flottant */}
+              <TouchableOpacity 
+                style={styles.floatingBackButton} 
+                onPress={() => navigation.goBack()}
+                activeOpacity={0.8}
+              >
+                <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
+              </TouchableOpacity>
+              {/* Bouton caméra flottant sur l'image */}
+              <TouchableOpacity 
+                style={styles.floatingCameraButton} 
+                onPress={handleRetake}
+                activeOpacity={0.8}
+              >
+                <MaterialCommunityIcons name="camera" size={24} color="#333" />
+              </TouchableOpacity>
+            </View>
 
             <View style={styles.stylesGrid}>
               {TRANSFORMATION_STYLES.map((style) => (
@@ -333,9 +341,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
   },
   content: {
+    marginTop: 20,
     paddingBottom: 20,
   },
   contentLandscape: {
+    marginTop: 20,
     paddingBottom: 0,
     flexGrow: 1,
   },
@@ -364,12 +374,29 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   imageContainer: {
-    margin: 16,
+    marginVertical: 16,
+    marginHorizontal: 8, // Moins de marge latérale pour plus d'espace
+    elevation: 8, // Ombre Android plus prononcée
+    shadowColor: '#000', // Ombre iOS
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
   },
   imageContainerLandscape: {
     margin: 0,
     marginVertical: 0,
     marginHorizontal: 0,
+    elevation: 8, // Ombre Android plus prononcée
+    shadowColor: '#000', // Ombre iOS
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
   },
   sectionTitle: {
     fontSize: 18,
@@ -407,20 +434,19 @@ const styles = StyleSheet.create({
     padding: 16,
     marginTop: 0,
   },
+  buttonContainerLandscape: {
+    paddingTop: 8,
+  },
   transformButton: {
     borderRadius: 25,
   },
   transformButtonContent: {
     paddingVertical: 8,
   },
-  floatingButtons: {
+  floatingBackButton: {
     position: 'absolute',
     top: 16,
     left: 16,
-    flexDirection: 'row',
-    gap: 12,
-  },
-  floatingButton: {
     width: 48,
     height: 48,
     borderRadius: 24,
@@ -435,5 +461,26 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 4,
+    zIndex: 10,
+  },
+  floatingCameraButton: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    zIndex: 10,
   },
 });

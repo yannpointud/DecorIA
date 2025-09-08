@@ -3,11 +3,9 @@ import React, { useEffect } from 'react';
 import {
   View,
   StyleSheet,
-  Alert,
-  Platform,
   TouchableOpacity,
 } from 'react-native';
-import { Appbar, FAB } from 'react-native-paper';
+import { Appbar } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { useAppContext } from '../contexts/AppContext';
 import { useOrientation } from '../hooks/useOrientation';
@@ -35,9 +33,6 @@ export const ResultScreen: React.FC = () => {
     navigation.navigate('Home');
   };
 
-  const handleRetry = () => {
-    navigation.navigate('Transform');
-  };
 
   // Vérifier les images et naviguer si nécessaire dans useEffect
   useEffect(() => {
@@ -65,34 +60,32 @@ export const ResultScreen: React.FC = () => {
         afterImage={transformedImage}
       />
 
-      {/* Bouton retour flottant en paysage */}
-      {isLandscape && (
-        <TouchableOpacity 
-          style={styles.floatingBackButton} 
-          onPress={() => navigation.goBack()}
-          activeOpacity={0.8}
-        >
-          <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
-        </TouchableOpacity>
-      )}
+      {/* Bouton retour flottant - toujours visible */}
+      <TouchableOpacity 
+        style={styles.floatingBackButton} 
+        onPress={() => navigation.goBack()}
+        activeOpacity={0.8}
+      >
+        <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
+      </TouchableOpacity>
 
-      <View style={styles.fabContainer}>
-        <FAB
-          icon="camera"
-          onPress={handleNewPhoto}
-          style={[styles.fab, styles.leftFab]}
-        />
-        <FAB
-          icon="refresh"
-          onPress={handleRetry}
-          style={[styles.fab, styles.centerFab]}
-        />
-        <FAB
-          icon="download"
-          onPress={handleSave}
-          style={[styles.fab, styles.rightFab]}
-        />
-      </View>
+      {/* Bouton appareil photo - haut droite */}
+      <TouchableOpacity 
+        style={styles.floatingCameraButton} 
+        onPress={handleNewPhoto}
+        activeOpacity={0.8}
+      >
+        <MaterialCommunityIcons name="camera" size={24} color="#333" />
+      </TouchableOpacity>
+
+      {/* Bouton télécharger - bas gauche */}
+      <TouchableOpacity 
+        style={styles.floatingDownloadButton} 
+        onPress={handleSave}
+        activeOpacity={0.8}
+      >
+        <MaterialCommunityIcons name="download" size={24} color="#333" />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -102,31 +95,49 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#000',
   },
-  fabContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingBottom: Platform.OS === 'ios' ? 30 : 20,
-    paddingHorizontal: 10,
-  },
-  fab: {
-    backgroundColor: '#2196F3',
-  },
-  leftFab: {
-    marginRight: 5,
-  },
-  centerFab: {
-    marginHorizontal: 5,
-  },
-  rightFab: {
-    marginLeft: 5,
-  },
   floatingBackButton: {
     position: 'absolute',
     top: 16,
+    left: 16,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    zIndex: 10,
+  },
+  floatingCameraButton: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    zIndex: 10,
+  },
+  floatingDownloadButton: {
+    position: 'absolute',
+    bottom: 16,
     left: 16,
     width: 48,
     height: 48,
