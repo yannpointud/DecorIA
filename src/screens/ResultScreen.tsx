@@ -5,16 +5,20 @@ import {
   StyleSheet,
   Alert,
   Platform,
+  TouchableOpacity,
 } from 'react-native';
 import { Appbar, FAB } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { useAppContext } from '../contexts/AppContext';
+import { useOrientation } from '../hooks/useOrientation';
 import { ImageComparison } from '../components/ImageComparison';
 import imageService from '../services/imageService';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export const ResultScreen: React.FC = () => {
   const navigation = useNavigation<any>();
   const { originalImage, transformedImage, resetState } = useAppContext();
+  const { isLandscape } = useOrientation();
 
   const handleSave = async () => {
     if (!transformedImage) return;
@@ -49,32 +53,42 @@ export const ResultScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Appbar.Header>
-        <Appbar.BackAction onPress={() => navigation.goBack()} />
-        <Appbar.Content title="Résultat" />
-      </Appbar.Header>
+      {!isLandscape && (
+        <Appbar.Header>
+          <Appbar.BackAction onPress={() => navigation.goBack()} />
+          <Appbar.Content title="Résultat" />
+        </Appbar.Header>
+      )}
 
       <ImageComparison
         beforeImage={originalImage}
         afterImage={transformedImage}
       />
 
+      {/* Bouton retour flottant en paysage */}
+      {isLandscape && (
+        <TouchableOpacity 
+          style={styles.floatingBackButton} 
+          onPress={() => navigation.goBack()}
+          activeOpacity={0.8}
+        >
+          <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
+        </TouchableOpacity>
+      )}
+
       <View style={styles.fabContainer}>
         <FAB
           icon="camera"
-          label="Nouvelle photo"
           onPress={handleNewPhoto}
           style={[styles.fab, styles.leftFab]}
         />
         <FAB
           icon="refresh"
-          label="Refaire"
           onPress={handleRetry}
           style={[styles.fab, styles.centerFab]}
         />
         <FAB
           icon="download"
-          label="Sauvegarder"
           onPress={handleSave}
           style={[styles.fab, styles.rightFab]}
         />
@@ -109,5 +123,25 @@ const styles = StyleSheet.create({
   },
   rightFab: {
     marginLeft: 5,
+  },
+  floatingBackButton: {
+    position: 'absolute',
+    top: 16,
+    left: 16,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    zIndex: 10,
   },
 });

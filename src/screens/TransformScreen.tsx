@@ -8,6 +8,7 @@ import {
   Text,
   Alert,
   Dimensions,
+  TouchableOpacity,
 } from 'react-native';
 import { Button, Appbar } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
@@ -18,6 +19,7 @@ import { StyleCard } from '../components/StyleCard';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import { AdaptiveImage } from '../components/AdaptiveImage';
 import { TRANSFORMATION_STYLES } from '../constants/styles';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export const TransformScreen: React.FC = () => {
   const navigation = useNavigation<any>();
@@ -123,14 +125,16 @@ export const TransformScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Appbar.Header>
-        <Appbar.BackAction onPress={() => navigation.goBack()} />
-        <Appbar.Content title="Choisir un style" />
-        <Appbar.Action 
-          icon="camera" 
-          onPress={handleRetake}
-        />
-      </Appbar.Header>
+      {!isLandscape && (
+        <Appbar.Header>
+          <Appbar.BackAction onPress={() => navigation.goBack()} />
+          <Appbar.Content title="Choisir un style" />
+          <Appbar.Action 
+            icon="camera" 
+            onPress={handleRetake}
+          />
+        </Appbar.Header>
+      )}
 
       <ScrollView contentContainerStyle={[
         styles.content,
@@ -145,6 +149,23 @@ export const TransformScreen: React.FC = () => {
                 showLabel="Photo originale"
                 containerStyle={styles.imageContainerLandscape}
               />
+              {/* Boutons flottants en paysage */}
+              <View style={styles.floatingButtons}>
+                <TouchableOpacity 
+                  style={styles.floatingButton} 
+                  onPress={() => navigation.goBack()}
+                  activeOpacity={0.8}
+                >
+                  <MaterialCommunityIcons name="arrow-left" size={24} color="#333" />
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={styles.floatingButton} 
+                  onPress={handleRetake}
+                  activeOpacity={0.8}
+                >
+                  <MaterialCommunityIcons name="camera" size={24} color="#333" />
+                </TouchableOpacity>
+              </View>
             </View>
             
             {/* Styles à droite */}
@@ -335,5 +356,28 @@ const styles = StyleSheet.create({
   },
   transformButtonContent: {
     paddingVertical: 8,
+  },
+  floatingButtons: {
+    position: 'absolute',
+    top: 16,
+    left: 16,
+    flexDirection: 'row',
+    gap: 12,
+  },
+  floatingButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
   },
 });
