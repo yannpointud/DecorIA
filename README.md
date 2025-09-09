@@ -11,7 +11,7 @@ DecorIA est une application mobile React Native qui transforme vos photos de pi�
 ## ✨ Fonctionnalités
 
 - 📸 **Capture photo** - Caméra intégrée avec ratios personnalisables (Auto/16:9/4:3)
-- 🎨 **7 styles de transformation** - Sur mesure, Vide, Rénové, Délabrée, Luxueux, Minimaliste
+- 🎨 **6 styles de transformation** - Sur mesure, Vide, Rénové, Délabrée, Luxueux, Minimaliste
 - 🔄 **Interface intuitive** - Navigation fluide avec comparaison avant/après
 - 📱 **Design adaptatif** - Support portrait/paysage avec positionnement optimisé
 - 💾 **Sauvegarde** - Export des images transformées vers la galerie
@@ -237,11 +237,15 @@ eas login
 
 ## 📄 Licence
 
-Ce projet est publié sous la licence Creative Commons Attribution - NonCommercial (CC BY-NC).
-Vous pouvez : utiliser, partager et modifier le code, tant que c’est sans but commercial et en citant l’auteur original.
-Vous ne pouvez pas : utiliser ce projet, en tout ou en partie, pour des usages commerciaux, produits ou services payants, sans autorisation préalable.
+Ce projet est publié sous une licence propriétaire détaillée dans le fichier `LICENSE`.
 
-## 👉 Clause importante :
+En résumé, vous pouvez :
+*   Utiliser, partager et modifier le code, tant que c’est **sans but commercial** et en citant l’auteur original.
+
+Vous ne pouvez pas :
+*   Utiliser ce projet, en tout ou en partie, pour des **usages commerciaux**, produits ou services payants, sans une autorisation écrite préalable.
+
+### 👉 Clause importante
 L’auteur de ce projet se réserve le droit d’utiliser et d’exploiter commercialement son propre travail. 
 La restriction "NonCommercial" s’applique uniquement aux tiers.
 Pour toute demande de licence commerciale, merci de me contacter directement.
@@ -252,13 +256,6 @@ Pour toute demande de licence commerciale, merci de me contacter directement.
 - Email: yann@pointud.fr
 - GitHub: [@yann-pointud](https://github.com/yann-pointud)
 
-## 🙏 Remerciements
-
-- [Google Gemini](https://ai.google.dev/) pour l'API de transformation d'images
-- [Expo](https://expo.dev/) pour la plateforme de développement
-- [React Native](https://reactnative.dev/) pour le framework
-
----
 
 <p align="center">
   <strong>⭐ N'hésitez pas à donner une étoile si ce projet vous plaît !</strong>

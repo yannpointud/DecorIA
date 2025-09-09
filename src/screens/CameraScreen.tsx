@@ -56,7 +56,7 @@ export const CameraScreen: React.FC = () => {
       });
       
       setOriginalImage(photo.uri);
-      setCaptureAspectRatio(aspectRatio || '16:9');
+      setCaptureAspectRatio(aspectRatio || '4:3');
       navigation.navigate('Transform');
     } catch (error) {
       Alert.alert('Erreur', 'Impossible de prendre la photo');
