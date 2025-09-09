@@ -277,6 +277,8 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 16,
     marginHorizontal: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   ratioButtonSelected: {
     backgroundColor: 'white',

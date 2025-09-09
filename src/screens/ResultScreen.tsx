@@ -5,10 +5,8 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
-import { Appbar } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { useAppContext } from '../contexts/AppContext';
-import { useOrientation } from '../hooks/useOrientation';
 import { ImageComparison } from '../components/ImageComparison';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import imageService from '../services/imageService';
@@ -24,7 +22,6 @@ export const ResultScreen: React.FC = () => {
     isLoading, 
     loadingProgress 
   } = useAppContext();
-  const { isLandscape } = useOrientation();
   const [isRetrying, setIsRetrying] = useState(false);
 
   const handleSave = async () => {
@@ -69,12 +66,6 @@ export const ResultScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      {!isLandscape && (
-        <Appbar.Header>
-          <Appbar.BackAction onPress={() => navigation.goBack()} />
-          <Appbar.Content title="Résultat" />
-        </Appbar.Header>
-      )}
 
       <ImageComparison
         beforeImage={originalImage}
@@ -99,18 +90,9 @@ export const ResultScreen: React.FC = () => {
         <MaterialCommunityIcons name="camera" size={24} color="#333" />
       </TouchableOpacity>
 
-      {/* Bouton télécharger - bas gauche */}
+      {/* Bouton retry - bas gauche */}
       <TouchableOpacity 
         style={styles.floatingDownloadButton} 
-        onPress={handleSave}
-        activeOpacity={0.8}
-      >
-        <MaterialCommunityIcons name="download" size={24} color="#333" />
-      </TouchableOpacity>
-
-      {/* Bouton retry - bas droite */}
-      <TouchableOpacity 
-        style={styles.floatingRetryButton} 
         onPress={handleRetry}
         activeOpacity={0.8}
         disabled={isLoading || isRetrying}
@@ -120,6 +102,15 @@ export const ResultScreen: React.FC = () => {
           size={24} 
           color={isLoading || isRetrying ? "#999" : "#333"} 
         />
+      </TouchableOpacity>
+
+      {/* Bouton télécharger - bas droite */}
+      <TouchableOpacity 
+        style={styles.floatingRetryButton} 
+        onPress={handleSave}
+        activeOpacity={0.8}
+      >
+        <MaterialCommunityIcons name="download" size={24} color="#333" />
       </TouchableOpacity>
 
       {/* Loading overlay pour retry */}
@@ -139,7 +130,7 @@ const styles = StyleSheet.create({
   },
   floatingBackButton: {
     position: 'absolute',
-    top: 16,
+    top: 30,
     left: 16,
     width: 48,
     height: 48,
@@ -159,7 +150,7 @@ const styles = StyleSheet.create({
   },
   floatingCameraButton: {
     position: 'absolute',
-    top: 16,
+    top: 30,
     right: 16,
     width: 48,
     height: 48,
@@ -179,7 +170,7 @@ const styles = StyleSheet.create({
   },
   floatingDownloadButton: {
     position: 'absolute',
-    bottom: 16,
+    bottom: 30,
     left: 16,
     width: 48,
     height: 48,
@@ -199,7 +190,7 @@ const styles = StyleSheet.create({
   },
   floatingRetryButton: {
     position: 'absolute',
-    bottom: 16,
+    bottom: 30,
     right: 16,
     width: 48,
     height: 48,

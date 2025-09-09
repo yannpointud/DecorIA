@@ -1,10 +1,10 @@
-import { GEMINI_API_KEY } from '@env';
+import { GEMINI_API_KEY, GEMINI_API_URL } from '@env';
 
 export const API_CONFIG = {
   GEMINI_API_KEY: GEMINI_API_KEY || 'YOUR_API_KEY_HERE', // À remplacer
-  GEMINI_API_URL: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent',
+  GEMINI_API_URL: GEMINI_API_URL || 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent',
   REQUEST_TIMEOUT: 30000, // 30 seconds
-  MAX_IMAGE_SIZE: 4 * 1024 * 1024, // 4MB
+  MAX_IMAGE_SIZE: 4 * 1920 * 1920, // 4MB
 };
 
 export const IMAGE_CONFIG = {
