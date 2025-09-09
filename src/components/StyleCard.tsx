@@ -37,7 +37,7 @@ export const StyleCard: React.FC<StyleCardProps> = ({
           >
             <MaterialCommunityIcons
               name={style.icon as any}
-              size={isLandscape ? 20 : 24}
+              size={isLandscape ? 24 : 24}
               color="white"
             />
           </View>
@@ -89,9 +89,9 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   iconContainerLandscape: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 8,

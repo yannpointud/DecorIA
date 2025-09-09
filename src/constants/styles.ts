@@ -9,21 +9,12 @@ export interface TransformationStyle {
 
 export const TRANSFORMATION_STYLES: TransformationStyle[] = [
   {
-    id: 'tidy',
-    name: 'Rangée',
-    prompt: `Your task is to digitally tidy this room: You must identify and remove all clutter while preserving the main furniture and the room's structure.
-
-**Specific actions required:**
-1. CLEAR ALL SURFACES: Remove any  items from the floor, chairs, sofas, tables, and desks.
-2. MAKE THE BED: If there is a bed, it must be neatly made, with the covers smooth and pillows arranged.
-3. CLOSE EVERYTHING: Ensure all drawers, cabinets, and wardrobe doors are fully closed.
-4. PRESERVE WITH 100% FIDELITY: The original walls, floor, ceiling, windows, and doors must remain completely unchanged in their position, shape, and texture.
-4. INPAINT LOGICALLY: When a piece of furniture is removed, you must fill the empty space by seamlessly extending the texture and color of the wall and floor that were behind it. The goal is to reveal what is hidden, not to invent something new.
-
-**Crucial Rule:** **DO NOT** add, replace, or significantly alter the existing furniture. A messy chair should become the *exact same chair*, but with the clothes removed from it. The final image must be the same room, just perfectly clean and organized.`,
-    icon: 'broom',
-    color: '#4CAF50',
-    description: 'Espace rangé organisé'
+    id: 'custom',
+    name: 'Sur mesure',
+    prompt: 'Transforme cette pièce en ',
+    icon: 'pencil-outline',
+    color: '#FF5722',
+    description: 'Votre vision personnalisée'
   },
   {
     id: 'empty',
@@ -49,14 +40,6 @@ The final image must be the empty architectural shell of the exact same room.`,
     description: 'Design moderne et rénové'
   },
   {
-    id: 'deteriorated',
-    name: 'Délabrée',
-    prompt: 'Transform this room to look abandoned and deteriorated. Add wear, peeling paint, damaged walls, broken items, dust, and signs of neglect while keeping the same structure.',
-    icon: 'home-minus',
-    color: '#795548',
-    description: 'Version abandonnée'
-  },
-  {
     id: 'luxury',
     name: 'Luxueuse',
     prompt: 'Transform this room into an ultra-luxury version with high-end furniture, premium materials, elegant decoration, sophisticated lighting, and exclusive designer elements.',
@@ -73,11 +56,11 @@ The final image must be the empty architectural shell of the exact same room.`,
     description: 'Design épuré et zen'
   },
   {
-    id: 'custom',
-    name: 'Sur mesure',
-    prompt: 'Transforme cette pièce en ',
-    icon: 'pencil-outline',
-    color: '#FF5722',
-    description: 'Votre vision personnalisée'
+    id: 'deteriorated',
+    name: 'Délabrée',
+    prompt: 'Transform this room to look abandoned and deteriorated. Add wear, peeling paint, damaged walls, broken items, dust, and signs of neglect while keeping the same structure.',
+    icon: 'home-minus',
+    color: '#795548',
+    description: 'Version abandonnée'
   }
 ];

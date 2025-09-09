@@ -10,12 +10,17 @@ dist/
 web-build/
 .expo-shared/
 
-# Environment variables
+# Environment variables (keep .env.example)
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Build artifacts (EAS generates these)
+*.apk
+*.aab
+*.ipa
 
 # OS generated files
 .DS_Store
@@ -33,5 +38,8 @@ Thumbs.db
 # Logs
 *.log
 
-# EAS
+# EAS Build
 eas-build-local-*.json
+
+# TypeScript cache
+*.tsbuildinfo

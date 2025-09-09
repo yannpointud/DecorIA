@@ -120,7 +120,7 @@ export const HomeScreen: React.FC = () => {
       )}
 
       <View style={styles.footerContainer}>
-        <Text style={styles.footerText}>Yann POINTUD - 2025</Text>
+        <Text style={styles.footerText}>yann@pointud.fr - 2025</Text>
       </View>
     </View>
   );

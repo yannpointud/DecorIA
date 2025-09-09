@@ -120,7 +120,8 @@ export const TransformScreen: React.FC = () => {
 
   const handleStyleSelect = (style: any) => {
     if (style.id === 'custom') {
-      // Le style personnalisé ouvre directement la modal
+      // Le style personnalisé dé-sélectionne les autres et ouvre la modal
+      setSelectedStyle(null);
       setShowCustomModal(true);
     } else {
       // Les autres styles sont sélectionnables normalement

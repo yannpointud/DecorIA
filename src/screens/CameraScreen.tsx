@@ -16,6 +16,7 @@ import { IconButton } from 'react-native-paper';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { useAppContext } from '../contexts/AppContext';
 import { useCamera } from '../hooks/useCamera';
+import { useOrientation } from '../hooks/useOrientation';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export const CameraScreen: React.FC = () => {
@@ -23,12 +24,13 @@ export const CameraScreen: React.FC = () => {
   const cameraRef = useRef<CameraView>(null);
   const { setOriginalImage, setCaptureAspectRatio } = useAppContext();
   const { pickFromGallery } = useCamera();
+  const { isLandscape } = useOrientation();
   const isFocused = useIsFocused();
   
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [cameraType, setCameraType] = useState('back');
   const [isCapturing, setIsCapturing] = useState(false);
-  const [aspectRatio, setAspectRatio] = useState<CameraRatio>('16:9'); // Par défaut 16:9
+  const [aspectRatio, setAspectRatio] = useState<CameraRatio | null>(null); // Par défaut Auto
   const [zoom, setZoom] = useState(0); // Zoom de 0 à 1 (0 = dézoom maximum)
 
   const [permission, requestPermission] = useCameraPermissions();
@@ -50,10 +52,11 @@ export const CameraScreen: React.FC = () => {
         quality: 1,
         base64: false,
         skipProcessing: false,
+        shutterSound: false, // Désactive le son du déclencheur
       });
       
       setOriginalImage(photo.uri);
-      setCaptureAspectRatio(aspectRatio);
+      setCaptureAspectRatio(aspectRatio || '16:9');
       navigation.navigate('Transform');
     } catch (error) {
       Alert.alert('Erreur', 'Impossible de prendre la photo');
@@ -85,6 +88,39 @@ export const CameraScreen: React.FC = () => {
 
   const handleHome = () => {
     navigation.navigate('Home');
+  };
+
+  // Configuration des positions des boutons selon l'orientation
+  const BUTTON_POSITIONS = {
+    home: {
+      portrait: { top: 50, left: 20 },
+      landscape: { top: 50, left: 20 }
+    },
+    ratioSelector: {
+      portrait: { top: 50, alignSelf: 'center' as const },
+      landscape: { left: 20, top: '50%', transform: [{ translateY: -45 }] }
+    },
+    flip: {
+      portrait: { top: 50, right: 20 },
+      landscape: { bottom: 30, left: 20 }
+    },
+    gallery: {
+      portrait: { bottom: 30, left: 20 },
+      landscape: { bottom: 30, right: 20 }
+    },
+    capture: {
+      portrait: { bottom: 30, alignSelf: 'center' as const },
+      landscape: { right: 30, top: '50%', transform: [{ translateY: -35 }] }
+    },
+    zoom: {
+      portrait: { bottom: 30, right: 20 },
+      landscape: { top: 50, right: 30 }
+    }
+  };
+
+  const getButtonStyle = (buttonName: keyof typeof BUTTON_POSITIONS) => {
+    const position = BUTTON_POSITIONS[buttonName][isLandscape ? 'landscape' : 'portrait'];
+    return position;
   };
 
 
@@ -119,82 +155,86 @@ export const CameraScreen: React.FC = () => {
           ref={cameraRef}
           style={styles.camera} 
           facing={cameraType as any}
-          ratio={aspectRatio}
+          ratio={aspectRatio || '4:3'}
           zoom={zoom}
         >
-        <View style={styles.topControls}>
-          <IconButton
-            icon="home"
-            size={30}
-            iconColor="white"
-            onPress={handleHome}
-            style={styles.controlButton}
-          />
-          
-          <View style={styles.aspectRatioSelector}>
-            {[{ label: '16:9', value: '16:9' }, { label: '4:3', value: '4:3' }].map((ratio) => {
-              const isSelected = ratio.value === aspectRatio;
-              return (
-                <TouchableOpacity
-                  key={ratio.label}
-                  style={[
-                    styles.ratioButton,
-                    isSelected && styles.ratioButtonSelected
-                  ]}
-                  onPress={() => setAspectRatio(ratio.value as CameraRatio)}
-                >
-                  <Text style={[
-                    styles.ratioButtonText,
-                    isSelected && styles.ratioButtonTextSelected
-                  ]}>
-                    {ratio.label}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-          
-          <IconButton
-            icon="camera-flip"
-            size={30}
-            iconColor="white"
-            onPress={toggleCameraType}
-            style={styles.controlButton}
-          />
+        {/* Bouton Home */}
+        <IconButton
+          icon="home"
+          size={30}
+          iconColor="white"
+          onPress={handleHome}
+          style={[styles.controlButton, { position: 'absolute', ...getButtonStyle('home') }]}
+        />
+        
+        {/* Sélecteur de ratio */}
+        <View style={[
+          isLandscape ? styles.aspectRatioSelectorLandscape : styles.aspectRatioSelector, 
+          { position: 'absolute', ...getButtonStyle('ratioSelector') }
+        ]}>
+          {[{ label: 'Auto', value: null }, { label: '16:9', value: '16:9' }, { label: '4:3', value: '4:3' }].map((ratio) => {
+            const isSelected = ratio.value === aspectRatio;
+            return (
+              <TouchableOpacity
+                key={ratio.label}
+                style={[
+                  styles.ratioButton,
+                  isSelected && styles.ratioButtonSelected
+                ]}
+                onPress={() => setAspectRatio(ratio.value as CameraRatio | null)}
+              >
+                <Text style={[
+                  styles.ratioButtonText,
+                  isSelected && styles.ratioButtonTextSelected
+                ]}>
+                  {ratio.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
+        
+        {/* Bouton Flip */}
+        <IconButton
+          icon="camera-flip"
+          size={30}
+          iconColor="white"
+          onPress={toggleCameraType}
+          style={[styles.controlButton, { position: 'absolute', ...getButtonStyle('flip') }]}
+        />
 
-        <View style={styles.bottomControls}>
-          <IconButton
-            icon="image"
-            size={30}
-            iconColor="white"
-            onPress={handleGalleryPick}
-            style={styles.controlButton}
-          />
-          
-          <TouchableOpacity
-            style={[styles.captureButton, isCapturing && styles.capturingButton]}
-            onPress={takePicture}
-            disabled={isCapturing}
+        {/* Bouton Galerie */}
+        <IconButton
+          icon="image"
+          size={30}
+          iconColor="white"
+          onPress={handleGalleryPick}
+          style={[styles.controlButton, { position: 'absolute', ...getButtonStyle('gallery') }]}
+        />
+        
+        {/* Bouton Capture */}
+        <TouchableOpacity
+          style={[styles.captureButton, isCapturing && styles.capturingButton, { position: 'absolute', ...getButtonStyle('capture') }]}
+          onPress={takePicture}
+          disabled={isCapturing}
+        >
+          <View style={styles.captureButtonInner} />
+        </TouchableOpacity>
+        
+        {/* Boutons zoom */}
+        <View style={[styles.zoomContainer, { position: 'absolute', ...getButtonStyle('zoom') }]}>
+          <TouchableOpacity 
+            style={styles.zoomButton}
+            onPress={() => setZoom(Math.min(1, zoom + 0.1))}
           >
-            <View style={styles.captureButtonInner} />
+            <Text style={styles.zoomButtonText}>+</Text>
           </TouchableOpacity>
-          
-          {/* Boutons zoom */}
-          <View style={styles.zoomContainer}>
-            <TouchableOpacity 
-              style={styles.zoomButton}
-              onPress={() => setZoom(Math.min(1, zoom + 0.1))}
-            >
-              <Text style={styles.zoomButtonText}>+</Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={styles.zoomButton}
-              onPress={() => setZoom(Math.max(0, zoom - 0.1))}
-            >
-              <Text style={styles.zoomButtonText}>−</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity 
+            style={styles.zoomButton}
+            onPress={() => setZoom(Math.max(0, zoom - 0.1))}
+          >
+            <Text style={styles.zoomButtonText}>−</Text>
+          </TouchableOpacity>
         </View>
         </CameraView>
       )}
@@ -212,22 +252,6 @@ const styles = StyleSheet.create({
   camera: {
     flex: 1,
     width: '100%',
-  },
-  topControls: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingTop: Platform.OS === 'ios' ? 50 : 30,
-    paddingHorizontal: 20,
-  },
-  bottomControls: {
-    position: 'absolute',
-    bottom: 30,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    paddingHorizontal: 20,
   },
   controlButton: {
     backgroundColor: 'rgba(0,0,0,0.5)',
@@ -272,13 +296,22 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 4,
   },
+  aspectRatioSelectorLandscape: {
+    flexDirection: 'column',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    borderRadius: 20,
+    padding: 4,
+  },
   ratioButton: {
     paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingVertical: 8,
     borderRadius: 16,
     marginHorizontal: 2,
+    marginVertical: 2,
     justifyContent: 'center',
     alignItems: 'center',
+    minWidth: 40,
+    minHeight: 32,
   },
   ratioButtonSelected: {
     backgroundColor: 'white',
