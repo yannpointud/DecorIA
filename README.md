@@ -10,17 +10,12 @@ DecorIA est une application mobile React Native qui transforme vos photos de pi�
 
 ## 🎥 Démonstration
 
-### Videos de demonstration
-[▶️ Voir la démo 1](assets/Demo1.mp4)
-[▶️ Voir la démo 2](assets/Demo2.mp4)
+### Interface de l'application
+![Interface de l'application](assets/demo1.gif)
 
-<video width="100%" controls>
-    <source src="assets/Demo1.mp4" type="video/mp4">
-  </video>
-
-<video width="50%" controls>
-    <source src="assets/Demo2.mp4" type="video/mp4">
-  </video>
+### Transformations IA en action
+<img src="assets/demo1.gif" width="100%" alt="Transformations IA">
+<img src="assets/demo2.gif" width="50%" alt="Transformations IA">
 
 ## ✨ Fonctionnalités
 
