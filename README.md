@@ -8,6 +8,20 @@ DecorIA est une application mobile React Native qui transforme vos photos de pi�
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
 ![Expo](https://img.shields.io/badge/Expo-000020?style=for-the-badge&logo=expo&logoColor=white)
 
+## 🎥 Démonstration
+
+### Interface de l'application
+<video width="100%" controls>
+  <source src="Demo1.mp4" type="video/mp4">
+  Votre navigateur ne supporte pas la lecture vidéo.
+</video>
+
+### Transformations IA en action
+<video width="50%" controls>
+  <source src="Demo2.mp4" type="video/mp4">
+  Votre navigateur ne supporte pas la lecture vidéo.
+</video>
+
 ## ✨ Fonctionnalités
 
 - 📸 **Capture photo** - Caméra intégrée avec ratios personnalisables (Auto/16:9/4:3)
@@ -254,7 +268,7 @@ Pour toute demande de licence commerciale, merci de me contacter directement.
 
 **Yann POINTUD**
 - Email: yann@pointud.fr
-- GitHub: [@yann-pointud](https://github.com/yann-pointud)
+- GitHub: [yannpointud](https://github.com/yannpointud)
 
 
 <p align="center">
