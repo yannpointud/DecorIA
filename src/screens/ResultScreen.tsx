@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   View,
   StyleSheet,
@@ -23,6 +23,7 @@ export const ResultScreen: React.FC = () => {
     loadingProgress 
   } = useAppContext();
   const [isRetrying, setIsRetrying] = useState(false);
+  const isNavigatingRef = useRef(false);
 
   const handleSave = async () => {
     if (!transformedImage) return;
@@ -47,16 +48,21 @@ export const ResultScreen: React.FC = () => {
   };
 
   const handleNewPhoto = () => {
+    // Marquer qu'on navigue intentionnellement
+    isNavigatingRef.current = true;
     resetState();
-    navigation.navigate('Home');
+    navigation.navigate('Camera');
   };
 
 
   // Vérifier les images et naviguer si nécessaire dans useEffect
   useEffect(() => {
     if (!originalImage || !transformedImage) {
-      // Should not happen, but handle gracefully
-      navigation.navigate('Home');
+      // Ne pas rediriger si on navigue intentionnellement
+      if (!isNavigatingRef.current) {
+        // Should not happen, but handle gracefully
+        navigation.navigate('Home');
+      }
     }
   }, [originalImage, transformedImage, navigation]);
 

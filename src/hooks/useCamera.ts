@@ -27,21 +27,28 @@ export const useCamera = () => {
   }, [setOriginalImage, setError]);
 
   const pickFromGallery = useCallback(async () => {
+    console.log('🖼️ pickFromGallery: Starting gallery picker');
     setIsCapturing(true);
     setError(null);
 
     try {
       const uri = await imageService.pickImage();
+      console.log('🖼️ pickFromGallery: Image URI received:', uri ? 'SUCCESS' : 'CANCELLED');
+      
       if (uri) {
         setOriginalImage(uri);
+        console.log('🖼️ pickFromGallery: Image set in context');
         return true;
       }
+      console.log('🖼️ pickFromGallery: No image selected (user cancelled)');
       return false;
     } catch (error) {
+      console.error('🖼️ pickFromGallery: Error:', error);
       setError('Erreur lors de la sélection');
       return false;
     } finally {
       setIsCapturing(false);
+      console.log('🖼️ pickFromGallery: Process completed');
     }
   }, [setOriginalImage, setError]);
 

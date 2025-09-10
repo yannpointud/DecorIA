@@ -1,29 +1,7 @@
-import { DefaultTheme, configureFonts } from 'react-native-paper';
-
-const fontConfig = {
-  default: {
-    regular: {
-      fontFamily: 'System',
-      fontWeight: 'normal' as const,
-    },
-    medium: {
-      fontFamily: 'System',
-      fontWeight: '500' as const,
-    },
-    light: {
-      fontFamily: 'System',
-      fontWeight: '300' as const,
-    },
-    thin: {
-      fontFamily: 'System',
-      fontWeight: '100' as const,
-    },
-  },
-};
+import { DefaultTheme } from 'react-native-paper';
 
 export const theme = {
   ...DefaultTheme,
-  fonts: configureFonts({ config: fontConfig }),
   colors: {
     ...DefaultTheme.colors,
     primary: '#2196F3',

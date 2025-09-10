@@ -8,6 +8,7 @@ import {
   Alert,
   Platform,
   BackHandler,
+  Dimensions,
 } from 'react-native';
 
 import { CameraView, useCameraPermissions, CameraRatio } from 'expo-camera';
@@ -90,6 +91,9 @@ export const CameraScreen: React.FC = () => {
     navigation.navigate('Home');
   };
 
+  // Obtenir les dimensions d'écran
+  const screenDimensions = Dimensions.get('window');
+  
   // Configuration des positions des boutons selon l'orientation
   const BUTTON_POSITIONS = {
     home: {
@@ -98,7 +102,7 @@ export const CameraScreen: React.FC = () => {
     },
     ratioSelector: {
       portrait: { top: 50, alignSelf: 'center' as const },
-      landscape: { left: 20, top: '50%', transform: [{ translateY: -45 }] }
+      landscape: { left: 20, top: Math.round(screenDimensions.height * 0.5 - 45) }
     },
     flip: {
       portrait: { top: 50, right: 20 },
@@ -110,7 +114,7 @@ export const CameraScreen: React.FC = () => {
     },
     capture: {
       portrait: { bottom: 30, alignSelf: 'center' as const },
-      landscape: { right: 30, top: '50%', transform: [{ translateY: -35 }] }
+      landscape: { right: 30, top: Math.round(screenDimensions.height * 0.5 - 35) }
     },
     zoom: {
       portrait: { bottom: 30, right: 20 },
