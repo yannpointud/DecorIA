@@ -9,6 +9,6 @@ export const API_CONFIG = {
 
 export const IMAGE_CONFIG = {
   COMPRESSION_QUALITY: 0.7,
-  MAX_DIMENSION: 1920,  // Dimension maximale (préserve le ratio)
+  MAX_DIMENSION: 1024,  // Dimension maximale (préserve le ratio)
   OUTPUT_FORMAT: 'jpeg' as const,
 };

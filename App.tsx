@@ -12,6 +12,7 @@ import { HomeScreen } from './src/screens/HomeScreen';
 import { CameraScreen } from './src/screens/CameraScreen';
 import { TransformScreen } from './src/screens/TransformScreen';
 import { ResultScreen } from './src/screens/ResultScreen';
+import { SettingsScreen } from './src/screens/SettingsScreen';
 import imageService from './src/services/imageService';
 
 // Type pour la navigation
@@ -20,6 +21,7 @@ export type RootStackParamList = {
   Camera: undefined;
   Transform: undefined;
   Result: undefined;
+  Settings: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -75,6 +77,13 @@ export default function App() {
                 component={ResultScreen}
                 options={{
                   title: 'Résultat',
+                }}
+              />
+              <Stack.Screen 
+                name="Settings" 
+                component={SettingsScreen}
+                options={{
+                  title: 'Paramètres',
                 }}
               />
             </Stack.Navigator>

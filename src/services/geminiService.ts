@@ -5,6 +5,7 @@ import * as FileSystem from 'expo-file-system';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { API_CONFIG, IMAGE_CONFIG } from '../constants/config';
 import { TransformationStyle } from '../constants/styles';
+import configService from './configService';
 
 interface GeminiRequest {
   contents: [{
@@ -38,12 +39,18 @@ interface GeminiResponse {
 }
 
 class GeminiService {
-  private apiKey: string;
-  private apiUrl: string;
+  /**
+   * Récupère la clé API depuis la configuration dynamique
+   */
+  private async getApiKey(): Promise<string> {
+    return await configService.getApiKey();
+  }
 
-  constructor() {
-    this.apiKey = API_CONFIG.GEMINI_API_KEY;
-    this.apiUrl = API_CONFIG.GEMINI_API_URL;
+  /**
+   * Récupère l'URL API depuis la configuration dynamique
+   */
+  private async getApiUrl(): Promise<string> {
+    return await configService.getApiUrl();
   }
 
   /**
@@ -101,7 +108,7 @@ class GeminiService {
       return base64;
     } catch (error) {
       console.error('Error preparing image:', error);
-      throw new Error('Failed to prepare image for processing');
+      throw new Error('Échec de la préparation de l\'image');
     }
   }
 
@@ -118,7 +125,7 @@ class GeminiService {
         const ctx = canvas.getContext('2d');
         
         if (!ctx) {
-          reject(new Error('Could not get canvas context'));
+          reject(new Error('Impossible d\'obtenir le contexte canvas'));
           return;
         }
 
@@ -150,7 +157,7 @@ class GeminiService {
       };
 
       img.onerror = () => {
-        reject(new Error('Failed to load image'));
+        reject(new Error('Échec du chargement de l\'image'));
       };
 
       img.src = imageUri;
@@ -189,11 +196,15 @@ CRITICALS requirements:
     style: TransformationStyle,
     onProgress?: (progress: number) => void
   ): Promise<string> {
+    // Récupérer la configuration dynamique
+    const apiKey = await this.getApiKey();
+    const apiUrl = await this.getApiUrl();
+    
     // Debug: afficher la clé API (masquée pour sécurité)
-    console.log('API Key status:', this.apiKey ? `${this.apiKey.substring(0, 10)}...` : 'No key');
+    console.log('API Key status:', apiKey ? `${apiKey.substring(0, 10)}...` : 'No key');
     
     // Si pas de vraie clé API, utiliser le mode mock
-    if (this.apiKey === 'YOUR_API_KEY_HERE' || this.apiKey === 'TEST_MODE' || !this.apiKey) {
+    if (apiKey === 'YOUR_API_KEY_HERE' || apiKey === 'TEST_MODE' || !apiKey) {
       console.log('Using mock mode');
       if (onProgress) onProgress(1);
       return this.mockTransform(style);
@@ -232,7 +243,7 @@ CRITICALS requirements:
       // Étape 3: Appel API (60%)
       if (onProgress) onProgress(0.6);
       const response = await axios.post<GeminiResponse>(
-        `${this.apiUrl}?key=${this.apiKey}`,
+        `${apiUrl}?key=${apiKey}`,
         request,
         {
           timeout: API_CONFIG.REQUEST_TIMEOUT,
@@ -288,17 +299,23 @@ CRITICALS requirements:
       
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 429) {
-          throw new Error('API rate limit exceeded. Please try again later.');
+          throw new Error('Limite de l\'API dépassée. Veuillez réessayer plus tard.');
         }
         if (error.response?.status === 401) {
-          throw new Error('Invalid API key. Please check your configuration.');
+          throw new Error('Clé API invalide. Vérifiez votre configuration.');
+        }
+        if (error.response?.status === 500) {
+          throw new Error('Erreur serveur de l\'API Google. Réessayez dans quelques minutes.');
         }
         if (error.code === 'ECONNABORTED') {
-          throw new Error('Request timeout. Please check your connection and try again.');
+          throw new Error('Délai d\'attente dépassé. Vérifiez votre connexion et réessayez.');
+        }
+        if (error.message === 'Network Error') {
+          throw new Error('Connexion réseau échouée. Vérifiez votre connexion internet et réessayez.');
         }
       }
       
-      throw new Error('Failed to transform image. Please try again.');
+      throw new Error('Échec de la transformation d\'image. Veuillez réessayer.');
     }
   }
 

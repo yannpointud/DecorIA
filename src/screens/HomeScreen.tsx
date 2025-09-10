@@ -31,8 +31,21 @@ export const HomeScreen: React.FC = () => {
     }
   };
 
+  const handleSettingsPress = () => {
+    navigation.navigate('Settings');
+  };
+
   return (
     <View style={styles.container}>
+      {/* Bouton paramètres flottant - haut droite */}
+      <TouchableOpacity 
+        style={styles.settingsButton} 
+        onPress={handleSettingsPress}
+        activeOpacity={0.8}
+      >
+        <MaterialCommunityIcons name="cog" size={24} color="#333" />
+      </TouchableOpacity>
+
       {isLandscape ? (
         // Layout paysage : Logo+texte à gauche, boutons à droite
         <View style={styles.landscapeContent}>
@@ -223,5 +236,25 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: theme.colors.disabled,
     opacity: 0.8,
+  },
+  settingsButton: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    zIndex: 10,
   },
 });

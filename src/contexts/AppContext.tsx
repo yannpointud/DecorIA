@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { Alert } from 'react-native';
 import { TransformationStyle } from '../constants/styles';
 import geminiService from '../services/geminiService';
 import imageService from '../services/imageService';
@@ -165,7 +166,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       return true;
     } catch (error) {
       console.error('Transform error:', error);
-      setError(error instanceof Error ? error.message : 'Erreur de transformation');
+      const errorMessage = error instanceof Error ? error.message : 'Erreur de transformation';
+      setError(errorMessage);
+      
+      // Afficher Alert pour les erreurs répertoriées
+      if (error instanceof Error) {
+        Alert.alert('Erreur', error.message);
+      }
+      
       return false;
     } finally {
       setIsLoading(false);
@@ -175,7 +183,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const retryTransformation = async (): Promise<boolean> => {
     // Vérifier qu'on a une image originale
     if (!state.originalImage) {
-      setError('Impossible de relancer : image originale manquante');
+      const errorMsg = 'Impossible de relancer : image originale manquante';
+      setError(errorMsg);
+      Alert.alert('Erreur', errorMsg);
       return false;
     }
 
@@ -186,7 +196,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     };
 
     if (!paramsToUse.style) {
-      setError('Impossible de relancer : aucun style de transformation');
+      const errorMsg = 'Impossible de relancer : aucun style de transformation';
+      setError(errorMsg);
+      Alert.alert('Erreur', errorMsg);
       return false;
     }
     
