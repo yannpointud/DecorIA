@@ -17,6 +17,9 @@ web-build/
 .env.test.local
 .env.production.local
 
+CLAUDE.md
+documentation.md
+
 # Build artifacts (EAS generates these)
 *.apk
 *.aab
