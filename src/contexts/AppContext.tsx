@@ -13,6 +13,10 @@ interface AppState {
   loadingProgress: number;
   error: string | null;
   customPrompt: string | null;
+  lastTransformationParams: {
+    style: TransformationStyle;
+    customPrompt: string | null;
+  } | null;
 }
 
 interface AppContextType extends AppState {
@@ -40,6 +44,7 @@ const initialState: AppState = {
   loadingProgress: 0,
   error: null,
   customPrompt: null,
+  lastTransformationParams: null,
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -84,7 +89,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const resetState = () => {
-    setState(initialState);
+    // Conserver le prompt personnalisé et les derniers paramètres lors du reset
+    const currentCustomPrompt = state.customPrompt;
+    const currentLastParams = state.lastTransformationParams;
+    setState({ 
+      ...initialState, 
+      customPrompt: currentCustomPrompt,
+      lastTransformationParams: currentLastParams
+    });
   };
 
   const transformImage = async (overrideStyle?: TransformationStyle, overridePrompt?: string): Promise<boolean> => {
@@ -99,6 +111,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setIsLoading(true);
     setLoadingProgress(0);
     setError(null);
+
+    // Sauvegarder les paramètres de transformation pour le retry
+    setState(prev => ({ 
+      ...prev, 
+      lastTransformationParams: {
+        style: effectiveSelectedStyle,
+        customPrompt: effectiveCustomPrompt
+      }
+    }));
 
     try {
       // Utiliser le prompt personnalisé si défini, sinon le prompt du style
@@ -139,10 +160,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
       setLoadingProgress(1);
       
-      // Nettoyer le prompt personnalisé après une transformation réussie
-      if (effectiveCustomPrompt && effectiveSelectedStyle?.id === 'custom') {
-        clearCustomPrompt();
-      }
+      // Le prompt personnalisé est conservé pour les prochaines transformations
       
       return true;
     } catch (error) {
@@ -155,12 +173,25 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const retryTransformation = async (): Promise<boolean> => {
-    if (!state.originalImage || !state.selectedStyle) {
-      setError('Impossible de relancer : données manquantes');
+    // Vérifier qu'on a une image originale
+    if (!state.originalImage) {
+      setError('Impossible de relancer : image originale manquante');
+      return false;
+    }
+
+    // Utiliser les derniers paramètres sauvegardés si disponibles, sinon utiliser l'état actuel
+    const paramsToUse = state.lastTransformationParams || {
+      style: state.selectedStyle,
+      customPrompt: state.customPrompt
+    };
+
+    if (!paramsToUse.style) {
+      setError('Impossible de relancer : aucun style de transformation');
       return false;
     }
     
-    return await transformImage(state.selectedStyle, state.customPrompt || undefined);
+    console.log('Retry with saved params:', paramsToUse);
+    return await transformImage(paramsToUse.style, paramsToUse.customPrompt || undefined);
   };
 
   const mockTransform = async (overrideStyle?: TransformationStyle, overridePrompt?: string): Promise<boolean> => {
@@ -172,6 +203,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     console.log('Mock transform started');
     setIsLoading(true);
     setLoadingProgress(0);
+
+    // Sauvegarder les paramètres de transformation pour le retry
+    setState(prev => ({ 
+      ...prev, 
+      lastTransformationParams: {
+        style: effectiveSelectedStyle,
+        customPrompt: effectiveCustomPrompt
+      }
+    }));
 
     try {
       // Utiliser le prompt personnalisé si défini, sinon le prompt du style
@@ -187,10 +227,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       setTransformedImage(mockUri);
       setLoadingProgress(1);
       
-      // Nettoyer le prompt personnalisé après une transformation réussie
-      if (effectiveCustomPrompt && effectiveSelectedStyle?.id === 'custom') {
-        clearCustomPrompt();
-      }
+      // Le prompt personnalisé est conservé pour les prochaines transformations
       
       console.log('Mock transform completed');
       return true;
