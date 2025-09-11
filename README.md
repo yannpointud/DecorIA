@@ -25,6 +25,18 @@ https://github.com/user-attachments/assets/c48f4589-3c68-471c-8699-45b317b76657
 
 ## 🚀 Installation rapide
 
+## Version compilée (APK / Android)
+Si vous avez une clé API Google AI studio, vous pouvez directement la mettre dans l'application (et vérifier l'URL).
+**📱 [Télécharger DecorIA.apk](DecorIA.apk)**
+
+Actuellement, le LLM Nano Banana est en preview, la bonne URL est donc :
+https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent
+Plus tard elle sera probablement : 
+https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent
+
+
+## Installation developpeur
+
 ### Prérequis
 - [Node.js](https://nodejs.org/) 18+
 - [Expo CLI](https://docs.expo.dev/get-started/installation/)
@@ -144,7 +156,6 @@ src/
 
 | Style | Description | Prompt IA |
 |-------|-------------|-----------|
-| **Rangée** | Organisation parfaite de la pièce | Nettoie et organise tous les éléments |
 | **Vide** | Pièce sans meubles | Supprime mobilier et décorations |
 | **Rénovée** | Design moderne et contemporain | Modernise avec finitions haut de gamme |
 | **Délabrée** | Version abandonnée vieillie | Ajoute usure et signes de négligence |
@@ -214,20 +225,6 @@ expo start --clear
 eas logout
 eas login
 ```
-
-## 📝 Contribution
-
-1. **Fork** le projet
-2. **Créer** une branche feature (`git checkout -b feature/amazing-feature`)
-3. **Commit** vos changements (`git commit -m 'Add amazing feature'`)
-4. **Push** vers la branche (`git push origin feature/amazing-feature`)
-5. **Ouvrir** une Pull Request
-
-### Guidelines
-- Respecter la structure existante
-- Ajouter des tests si nécessaire
-- Suivre les conventions TypeScript
-- Documenter les nouvelles fonctionnalités
 
 ## 💰 Coûts et limites
 
