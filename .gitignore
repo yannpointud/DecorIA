@@ -21,7 +21,7 @@ CLAUDE.md
 documentation.md
 
 # Build artifacts (EAS generates these)
-*.apk
+
 *.aab
 *.ipa
 
